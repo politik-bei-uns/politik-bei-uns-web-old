@@ -1,0 +1,35 @@
+# Robots, Spider und Crawler sind willkommen!
+#
+# Bitte nur 1 Thread, dem Server und anderen Nutzern zuliebe!
+#
+# Wenn Du an strukturierten Daten interessiert bist, schau Dir
+# bitte
+#
+#    http://offeneskoeln.de/api/
+#
+# an! Das koennte Dir Zeit und uns Server-Ressourcen sparen. :)
+
+Sitemap: /static/sitemap/sitemap.xml
+
+User-agent: *
+Disallow: /suche/
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: Googlebot
+Disallow: /suche/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /oparl/
+
+User-agent:Yahoo! Slurp
+Disallow: /suche/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /oparl/
+
+User-agent: bingbot
+Disallow: /suche/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /oparl/

@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}API{% endblock %}
+{% block ogtitle %}API{% endblock %}
+{% block meta_description %}Für echte Offenheit braucht es offene Schnittstellen. Hier gibt es Informationen über unsere Webservice API.{% endblock %}
+
+{% block riscontent %}
+<div id="api">
+<div class="content top">
+  <h1>Die {{ config.APP_NAME }} API</h1>
+  <blockquote class="nice">API = engl. <em>Application Program Interface</em>: Eine Programmierschnittstelle für den Zugriff auf ein System.</blockquote>
+  
+  <p class="text">Das Ziel des offenen Ratsinformationssystems ist es, Daten und Informationen der Lokalpolitik so weit wie möglich für jede denkbare Nutzung zu öffnen. Dazu gehört auch die Öffnung für den Zugriff mit Hilfe von Programmen und Systemen.</p>
+</div>
+<div class="content middle">
+
+  <h2>Bereitstellung via OParl</h2>
+  
+  <blockquote class="nice">Das Ziel von OParl ist die Schaffung einer Standard-API für den Zugang zu öffentlichen Inhalten in kommunalen Ratsinformationssystemen, damit die Inhalte daraus im Sinne von Open Data für möglichst viele verschiedene Zwecke eingesetzt werden können.</blockquote>
+  
+  <p class="text">Alle hier präsentierten Daten sind über die <a href="http://oparl.org/">OParl-Schnittstelle</a> zu abrufbar. <a href="https://github.com/OParl/specs">Die Dokumentation befindet sich auf GitHub</a>, ebenso wie <a href="https://github.com/OParl/specs/issues">die Diskussion über die API</a>. Mitarbeit ist erwünscht! Die Basis-URL der Schnittstelle lautet:</p>
+  
+  <blockquote class="nice"><a href="/oparl">/oparl</a></blockquote>
+</div>
+<div class="content bottom">
+
+  <h2>Zusatzfunktionen zu OParl</h2>
+
+  <p class="text">Um die OParl-Schnittstelle kennenzulernen, bieten wir eine speziellen HTML-Ausgabe an:</p>
+  
+  <blockquote class="nice"><a href="/oparl?html=1">/oparl?html=1</a></blockquote>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block title %}Suche{% endblock %}
+{% block ogtitle %}Suche{% endblock %}
+{% block meta_description %}Hier findest Du alle amtlichen Dokumente im Bestand{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="alternate" type="application/rss+xml" title="RSS Feed neuer Dokumente in dieser Suche" href="/suche/feed/?r={{ search_settings.r }}&q={{ search_settings.q }}&fq={{ search_settings.fq }}" />
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}
+<script>
+var region_data = {
+	'id': '{{ region_id }}',
+	'name': '{{ config['regions'][region_id]['name'] }}',
+	'type': {{ config['regions'][region_id]['type'] }},
+	'lat': {{ config['regions'][region_id]['lat'] }},
+	'lon': {{ config['regions'][region_id]['lon'] }},
+	'zoom': {{ config['regions'][region_id]['zoom'] }},
+	'keyword': [{% for keyword in config['regions'][region_id]['keyword'] %}'{{ keyword }}', {% endfor %}]
+}
+var openris_search_settings = {
+	r: '{{ search_settings.r }}',
+	q: '{{ search_settings.q }}'.replace(/&quot;/g, "\""), // query string
+	fq: '{{ search_settings.fq }}'.replace(/&quot;/g, "\""), // filter query
+	ppp: {{ search_settings.ppp }}, // papers per page
+	start: {{ search_settings.start }}, // page offset
+	sort: "{{ search_settings.sort }}", // sorting
+	date: "{{ search_settings.date }}"// date range
+};
+</script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}
+
+{% block riscontent %}
+<div id="search">
+	<div id="region-choice" class="content top">
+		<div id="region-prompt">
+			<div id="region-question" class="question">Ausgewählte Region: <span id="region-current">{{ config['regions'][ search_settings.r ]['name'] }}</span> <span id="change-region" class="awesome extrawide">Ändern</span></div>
+			<div id="region-choice"></div>
+		</div>
+	</div>
+	<div id="search-summary" class="content middle">
+		<h1 style="margin-bottom: 0">Suche</h1>
+	</div>
+	<div id="search-form" class="content middle">
+		<form action="/suche/" method="get" id="searchform" accept-charset="utf-8">
+			<label class="qlabel" for="qinput">Suche:</label>
+			<input type="text" id="qinput" name="q" value="{{ search_settings.q }}" autocomplete="off" />
+			<input type="hidden" name="r" id="region_input" value="" />
+			<a id="search-submit" class="submit awesome extrawide" id="submit" href="/suche/">Suchen</a>
+		</form>
+	</div>
+	<div class="result content bottom">
+		<div class="loading big outer"><div class="loading big inner">Suche...</div></div>
+	</div>
+</div>
+{% endblock %}

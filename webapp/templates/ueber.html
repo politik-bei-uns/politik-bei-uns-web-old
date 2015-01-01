@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block title %}Über OpenRuhr:RIS{% endblock %}
+{% block ogtitle %}Über Offenes Köln{% endblock %}
+{% block meta_description %}Ziele und Pläne für Offenes Köln und weitere Informationen{% endblock %}
+
+{% block riscontent %}
+
+<div class="content top">
+	<h1>Offenes Ratsinformationssystem</h1>
+	<blockquote class="nice">Ziel des offenen Ratsinformationssystems ist es, Informationen, Dokumente und Daten aus der Lokalpolitik deutschlandweit für jedermann offen zugänglich zu machen.</blockquote>
+	<p>Dazu werden auf Dokumente und Daten, die in den jeweiligen Ratsinformationssystemen (<abbr title="Ratsinformationssystem">RIS</abbr>) vor Ort veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
+</div>
+<div class="content middle" id="origin">
+	<h2 class="top-nomargin">Verwendete Software</h2>
+	<div style="text-align: center; margin: 3em 5em;">
+		<p>Das offene Ratsinformationssystem basiert auf OpenSource Software. Im Einzelnen bedeutet das vor allem eine Verbindung aus Flask, MongoDB, ElasticSearch, Memcached, Gunicorn und Nginx.</p>
+		<p>Wenn Du das System für Deine Stadt einrichten möchtest, schau gerne auf <a href="https://github.com/openruhr/ris-web/">unserer Github-Seite</a> vorbei.</p>
+	</div>
+</div>
+<div class="content middle" id="feedback">
+	<h2 class="top-nomargin">Wünsche äußern</h2>
+	<div style="text-align: center; margin: 3em 5em;">
+		<p>Die Plattform <b>{{ config.APP_NAME }}</b> steht mit Ihrer Veröffentlichung im {{ config.PUBLISH_MONTH }} noch ganz am Anfang. Viele weitere Funktionen sind denkbar und wollen genauer durchdacht werden.</p>
+		<p>Offenes Köln hat eine Seite eigens zu dem Zweck, damit Du Anregungen und Verbesserungsvorschläge öffentlich äußern kann. Du kannst außerdem Vorschläge von anderen sehen, bewerten und kommentieren. Die Vorschläge werden auch hier einfließen.</p>
+		<p><a class="awesome large" href="http://offeneskoeln.uservoice.com/" target="_blank">Ideen ansehen und hinzufügen &nbsp; &rarr;</a></p>
+	</div>
+</div>
+<div class="content middle" id="mitmischen">
+	<h2 class="top-nomargin">Mitlesen und Mitmischen</h2>
+	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
+		<div style="overflow: auto; width: 750px; margin: 0px auto;">
+			<div style="float: left; width: 160px; margin: 0 3em;">
+				<div style="height: 82px;"><a href="https://www.facebook.com/pages/Openruhr/565665453457389" target="_blank"><img src="/static/img/facebook-f.png" width="71" height="70" alt="Facebook" style="border: 0"/></a></div>
+				<div style="margin-top: 5px;"><a href="https://www.facebook.com/pages/Openruhr/565665453457389" target="_blank">Facebook</a></div>
+			</div>
+			<div style="float: left; width: 160px; margin: 0 3em;">
+				<div style="height: 82px;"><a href="https://twitter.com/openruhr" target="_blank"><img src="/static/img/twitter-bird.png" width="87" height="61" alt="Facebook" style="border: 0"/></a></div>
+				<div style="margin-top: 5px;"><a href="https://twitter.com/openruhr" target="_blank">Twitter</a></div>
+			</div>
+			<div style="float: left; width: 160px; margin: 0 3em;">
+				<div style="height: 82px;"><img src="/static/img/github-octocat.png" width="87" height="77" alt="Facebook" style="border: 0"/></div>
+				<div style="margin-top: 5px;"><a href="https://github.com/marians/offeneskoeln" target="_blank" title="Der Code für offeneskoeln.de">Plattform</a> und <a href="https://github.com/marians/scrape-a-ris" target="_blank" title="Software zum Auslesen des {{ config.CITY_NAME_ER }} Ratsinformationssystems">Scraper</a> als Open Source Software auf Github</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="content middle" id="team">
+	<h2 class="top-nomargin">Das Team hinter Offenes Köln</h2>
+	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
+		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
+			<div style="width: 200px; float: left;">
+				<img src="/static/img/team/marian.jpg" width="150" height="150" alt="Marian" style="border: 0"/>
+			</div>
+			<div style="width: 400px; float: left;">
+				Marian Steinbach hat Offenes Köln ins Leben gerufen. Als freiberuflicher Interaction Designer interessiert er sich dafür, wie man Informationen, die <em>eigentlich</em> öffentlich und zugänglich sind, <em>tatsächlich</em> zugänglich macht, so dass Menschen sie wirklich benutzen können und wollen. In der Hinsicht gibt es bei Offenes Köln genug zu tun.<br /><br />
+				Marians <a href="http://www.sendung.de/" target="_blank">Blog</a> und <a href="https://twitter.com/#!/MarianSteinbach" target="_blank">Twitter Account</a>.
+			</div>
+		</div>
+		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
+			<div style="width: 200px; float: left;">
+				<img src="/static/img/team/ernesto.jpg" width="150" height="150" alt="Ernesto" style="border: 0"/>
+			</div>
+			<div style="width: 400px; float: left;">
+				Ernesto Ruge ist einer der Gründer von der Initiative OpenRuhr, hat die OpenRuhr-Ratsinformations-Oberfläche auf Basis von Marians Offenes Köln anfangs eingerichtet und steuert Ergänzungen zu der Software bei.<br /><br />
+				Ernestos <a href="http://sectio-aurea.org/" target="_blank">Blog</a> und <a href="https://twitter.com/the_infinity" target="_blank">Twitter Account</a>.
+			</div>
+		</div>
+		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
+			<div style="width: 200px; float: left;">
+				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Elmar" style="border: 0"/>
+			</div>
+			<div style="width: 400px; float: left;">
+				Elmar Burke ist ebenfalls einer der Gründer von der Initiative OpenRuhr, steuert regelmäßig Ergänzungen zu der Software bei und ist durch seine OpenData-/ OpenGoverment-Arbeit bei der Stadt Moers an der direkten Schnitstelle zwischen Kommune und Initiative.<br /><br />
+				Elmars <a href="http://blog.elmarburke.de/" target="_blank">Blog</a> und <a href="https://twitter.com/elmarburke" target="_blank">Twitter Account</a>.
+			</div>
+		</div>
+		<div style="overflow: auto; width: 750px; margin: 0px auto; text-align: left;">
+			<div style="width: 200px; float: left;">
+				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Du" style="border: 0"/>
+			</div>
+			<div style="width: 400px; float: left;">
+				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an {{ config.APP_NAME }} mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
+			</div>
+		</div>
+	</div>
+</div>
+<div class="content bottom" id="history">
+	<h2 class="top-nomargin">Geschichte</h2>
+	<div style="text-align: center;">
+		<p>Jedes Projekt hat eine Geschichte. Hier werden all jene Akteure aufgelistet, welche den Weg zum offenen Ratsinformationssystem unterstützt haben.</p>
+		<div style="overflow: auto; width: 800px; margin: 2em auto; text-align: left;">
+			<div style="width: 260px; float: left;">
+				<img src="/static/img/sponsoring/linuxhotel.png" alt="Linuxhotel" style="border: 0"/>
+			</div>
+			<div style="width: 450px; float: left; padding: 10px 0px 0px 50px;">
+				Das <a href="http://linuxhotel.de/">Linuxhotel</a> Villa Vogelsang bietet Schulungen uns Kurse überwiegend aus dem Bereich freier Software an. Neben technischem Komfort wie ein vollständig vernetztes Haus incl. Park gibt es auch Freizeitangebote wie ein Fitness- und Saunabereich. Es unterstützte das offene Ratsinformationssystem, indem es in der Anfangszeit für ein Jahr die Server für die Initiative OpenRuhr sponsorte.
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
