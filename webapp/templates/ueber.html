@@ -1,28 +1,31 @@
 {% extends "layout.html" %}
-{% block title %}Über OpenRuhr:RIS{% endblock %}
-{% block ogtitle %}Über Offenes Köln{% endblock %}
-{% block meta_description %}Ziele und Pläne für Offenes Köln und weitere Informationen{% endblock %}
+{% block title %}Über "Was passiert bei mir?"{% endblock %}
+{% block ogtitle %}Über O"Was passiert bei mir?"{% endblock %}
+{% block meta_description %}Ziele und Pläne für "Was passiert bei mir?" und weitere Informationen{% endblock %}
 
 {% block riscontent %}
 
 <div class="content top">
-	<h1>Offenes Ratsinformationssystem</h1>
-	<blockquote class="nice">Ziel des offenen Ratsinformationssystems ist es, Informationen, Dokumente und Daten aus der Lokalpolitik deutschlandweit für jedermann offen zugänglich zu machen.</blockquote>
-	<p>Dazu werden auf Dokumente und Daten, die in den jeweiligen Ratsinformationssystemen (<abbr title="Ratsinformationssystem">RIS</abbr>) vor Ort veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
-</div>
-<div class="content middle" id="origin">
-	<h2 class="top-nomargin">Verwendete Software</h2>
-	<div style="text-align: center; margin: 3em 5em;">
-		<p>Das offene Ratsinformationssystem basiert auf OpenSource Software. Im Einzelnen bedeutet das vor allem eine Verbindung aus Flask, MongoDB, ElasticSearch, Memcached, Gunicorn und Nginx.</p>
-		<p>Wenn Du das System für Deine Stadt einrichten möchtest, schau gerne auf <a href="https://github.com/openruhr/ris-web/">unserer Github-Seite</a> vorbei.</p>
-	</div>
+	<h1>Was passiert bei mir?</h1>
+	<ul>
+		<li>Warum ist die Baustelle da?</li>
+		<li>Was macht die Stadt gegen wilde Müllkippen?</li>
+		<li>Warum hat ist der Spielplatz gesperrt?</li>
+		<li>Wohin gehen eigentlich die Gewinne der Stadttochter?</li>
+		<li>Wie kann ich eigentlich bei mir vor Ort mitwirken?</li>
+	</ul>
+	<p>Wer hat sich solche Fragen noch nicht gestellt? All dies wird im Rat einer Stadt behandelt. Aber die Informationen kommen selten bei einem selbst an: zu komplex ist das offizielle Ratsinformationssystem, zu viel Vorwissen ist nötig, um die verschiedenen Ausschüsse und Regeln der Kommunalpolitik kennenzulernen.</p>
+	<p>Aus diesem Grunde haben wir diese Seite geschaffen: ein Ratsinformationssystem (<abbr title="Ratsinformationssystem">RIS</abbr>), welches für jeden nutzbar ist.</p>
+	<blockquote class="nice">Ziel des offenen Ratsinformationssystems ist es, Informationen, Dokumente und Daten aus der Kommunalpolitik deutschlandweit für jedermann offen zugänglich zu machen.</blockquote>
+	<p>Dazu werden auf Dokumente und Daten, die in den jeweiligen Ratsinformationssystemen vor Ort veröffentlicht werden, gesammelt, aufbereitet und in einer nutzerfreundlichen Art und Weise dargestellt.</p>
+	<p>Wir wollen das offizielle Ratsinformationssystem nicht ersetzen, sondern eine Alternative bieten. Die offiziellen Ratsinformationssysteme sind optimal für die tägliche Arbeit der Verwaltung und der politisch aktiven. Doch für einen einfachen Einstieg braucht es eine andere Oberfläche. Diese bieten wir.</p>
 </div>
 <div class="content middle" id="feedback">
-	<h2 class="top-nomargin">Wünsche äußern</h2>
+	<h2 class="top-nomargin">Wünsche äußern & weitere Städte</h2>
 	<div style="text-align: center; margin: 3em 5em;">
-		<p>Die Plattform <b>{{ config.APP_NAME }}</b> steht mit Ihrer Veröffentlichung im {{ config.PUBLISH_MONTH }} noch ganz am Anfang. Viele weitere Funktionen sind denkbar und wollen genauer durchdacht werden.</p>
-		<p>Offenes Köln hat eine Seite eigens zu dem Zweck, damit Du Anregungen und Verbesserungsvorschläge öffentlich äußern kann. Du kannst außerdem Vorschläge von anderen sehen, bewerten und kommentieren. Die Vorschläge werden auch hier einfließen.</p>
-		<p><a class="awesome large" href="http://offeneskoeln.uservoice.com/" target="_blank">Ideen ansehen und hinzufügen &nbsp; &rarr;</a></p>
+		<p>Wir haben eine Seite eigens zu dem Zweck, damit Du Anregungen und Verbesserungsvorschläge öffentlich äußern kann. Du kannst außerdem Vorschläge von anderen sehen, bewerten und kommentieren. Die Vorschläge werden auch hier einfließen.</p>
+		<p>Du kannst dort ebenso Städte vorschlagen, welche du hier veröffentlichst sehen möchtest. Bitte beachte dabei aber, dass eine neue Stadt viel Arbeit bedeutet. Wenn Du programmieren kannst und / oder finanzielle Ressourcen hast, wird das vieles vereinfachen. <a href="/impressum/">Kontaktiere uns dazu gerne direkt!</a></p>
+		<p><a class="awesome large" href="http://was-passiert-bei-mir.uservoice.com/" target="_blank">Ideen ansehen und hinzufügen &nbsp; &rarr;</a></p>
 	</div>
 </div>
 <div class="content middle" id="mitmischen">
@@ -49,29 +52,20 @@
 	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
 		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
 			<div style="width: 200px; float: left;">
-				<img src="/static/img/team/marian.jpg" width="150" height="150" alt="Marian" style="border: 0"/>
-			</div>
-			<div style="width: 400px; float: left;">
-				Marian Steinbach hat Offenes Köln ins Leben gerufen. Als freiberuflicher Interaction Designer interessiert er sich dafür, wie man Informationen, die <em>eigentlich</em> öffentlich und zugänglich sind, <em>tatsächlich</em> zugänglich macht, so dass Menschen sie wirklich benutzen können und wollen. In der Hinsicht gibt es bei Offenes Köln genug zu tun.<br /><br />
-				Marians <a href="http://www.sendung.de/" target="_blank">Blog</a> und <a href="https://twitter.com/#!/MarianSteinbach" target="_blank">Twitter Account</a>.
-			</div>
-		</div>
-		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
-			<div style="width: 200px; float: left;">
 				<img src="/static/img/team/ernesto.jpg" width="150" height="150" alt="Ernesto" style="border: 0"/>
 			</div>
 			<div style="width: 400px; float: left;">
-				Ernesto Ruge ist einer der Gründer von der Initiative OpenRuhr, hat die OpenRuhr-Ratsinformations-Oberfläche auf Basis von Marians Offenes Köln anfangs eingerichtet und steuert Ergänzungen zu der Software bei.<br /><br />
+				Ernesto Ruge ist einer der Gründer von der Initiative <a href="http://openruhr.de/">OpenRuhr</a>. Er hat Marians Offenes Köln zu "Was passiert bei mir?" weiterentwickelt. Er entwickelt gerne Daten-Anwendungen, die einen Mehrwert für Menschen geben, und möchte so Beteiligungsmöglichkeiten verbessern.<br /><br />
 				Ernestos <a href="http://sectio-aurea.org/" target="_blank">Blog</a> und <a href="https://twitter.com/the_infinity" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
 		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
 			<div style="width: 200px; float: left;">
-				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Elmar" style="border: 0"/>
+				<img src="/static/img/team/marian.jpg" width="150" height="150" alt="Marian" style="border: 0"/>
 			</div>
 			<div style="width: 400px; float: left;">
-				Elmar Burke ist ebenfalls einer der Gründer von der Initiative OpenRuhr, steuert regelmäßig Ergänzungen zu der Software bei und ist durch seine OpenData-/ OpenGoverment-Arbeit bei der Stadt Moers an der direkten Schnitstelle zwischen Kommune und Initiative.<br /><br />
-				Elmars <a href="http://blog.elmarburke.de/" target="_blank">Blog</a> und <a href="https://twitter.com/elmarburke" target="_blank">Twitter Account</a>.
+				Marian Steinbach hat den Vorgänger von "Was passiert bei mir?" mit dem Namen "Offenes Köln" ins Leben gerufen. Als freiberuflicher Interaction Designer interessiert er sich dafür, wie man Informationen, die <em>eigentlich</em> öffentlich und zugänglich sind, <em>tatsächlich</em> zugänglich macht, so dass Menschen sie wirklich benutzen können und wollen. In der Hinsicht gibt es bei Offenes Köln genug zu tun.<br /><br />
+				Marians <a href="http://www.sendung.de/" target="_blank">Blog</a> und <a href="https://twitter.com/#!/MarianSteinbach" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
 		<div style="overflow: auto; width: 750px; margin: 0px auto; text-align: left;">
@@ -79,7 +73,7 @@
 				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Du" style="border: 0"/>
 			</div>
 			<div style="width: 400px; float: left;">
-				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an {{ config.APP_NAME }} mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
+				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an "Was passiert bei mir?" mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
 			</div>
 		</div>
 	</div>

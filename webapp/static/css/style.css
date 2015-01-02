@@ -103,14 +103,14 @@ header {
 }
 
 #logo {
-    float: left;
-    width: 60px
+	float: left;
+	width: 60px
 }
 
 #nametagline {
-    float: left;
-    width: 250px;
-		padding-top: 15px;
+	float: left;
+	width: 250px;
+	padding-top: 15px;
 }
 #name {
 	font-size: 170%;
@@ -793,7 +793,7 @@ form .awesome {
   /* Gilt auch fuer iPad im vertikalen Modus */
   body { margin: 5px 20px; font-size: 14px;}
   header { min-height: 92px; }
-  #logo { width: 220px; }
+  #logo { width: 280px; }
   #nametagline { width: 300px; }
   #name { font-size: 200%; }
   #map { height: 580px; }

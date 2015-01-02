@@ -53,7 +53,7 @@
 			<img src="/static/img/ueber/ueber-persistenteurls.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
 		</div>
 		<div style="float: right; width: 250px;">
-			<p><b>Persistente URLs für Anlagen</b>: Anders als im RIS der Stadt {{ config.CITY_NAME }} kannst Du alle Anlagen (z.B. PDF-Dokumente) über einen öffentlichen, langfristig bestehenden <abbr title="Uniform Resource Locator">URL</abbr> abrufen. Dies ist eine Grundvoraussetzung, damit Du einen Favoriten/ein Lesezeichen auf die Datei setzen kannst. Oder einen Link zum Dokument per E-Mail weiter senden.</p>
+			<p><b>Persistente URLs für Anlagen</b>: Anders als im RIS der jeweiligen Stadt kannst Du alle Anlagen (z.B. PDF-Dokumente) über einen öffentlichen, langfristig bestehenden <abbr title="Uniform Resource Locator">URL</abbr> abrufen. Dies ist eine Grundvoraussetzung, damit Du einen Favoriten/ein Lesezeichen auf die Datei setzen kannst. Oder einen Link zum Dokument per E-Mail weiter senden.</p>
 		</div>
 	</div>
 </div>
@@ -63,7 +63,7 @@
 			<img src="/static/img/ueber/ueber-daten.jpg" width="250" height="250" alt="Screenshot" style="border: 1px solid #fff" />
 		</div>
 		<div style="float: left; width: 250px;">
-			<p><b>Daten-Download</b>: Die Datenbank hinter {{ config.BASE_HOST }} steht zum Download zur Verfügung. <a href="/daten/">Mehr erfahren</a></p>
+			<p><b>Daten-Download</b>: Die Datenbank hinter "Was passiert bei mir?" steht zum Download zur Verfügung. <a href="/daten/">Mehr erfahren</a></p>
 		</div>
 	</div>
 </div>
@@ -78,25 +78,10 @@
 	</div>
 </div>
 
-<div class="content middle" id="links">
+<div class="content bottom" id="links">
 	<h2 class="top-nomargin">Zum Weiterklicken</h2>
 	<p>Niemand ist eine Insel, erst recht nicht im World Wide Web. Daher gibt es hier gesammelt wesentliche Links zu relevanten Ressourcen.</p>
-	<p>Das <a href="{{ config.RIS_ORIGINAL_URL }}" target="_blank">Ratsinformationssystem der Stadt {{ config.CITY_NAME }}</a> ist die Quelle der Dokumente, dier hier auf {{ config.BASE_HOST}} zu finden sind. Dieses System gibt es unter anderem, um die Gremienarbeit, so wie sie in der <a href="https://recht.nrw.de/lmi/owa/pl_text_anzeigen?v_id=2320021205103438063" target="_blank">Gemeindeordnung des Landes NRW</a> und in der <a href="{{ config.GESCHAEFTSORDNUNG_URL}}" target="_blank">Geschäftsordnung des Rates der Stadt {{ config.CITY_NAME }} (PDF)</a> festgelegt sind.</p>
-	<p>Sowas wie {{ config.APP_NAME }} gibt es schon länger in Frankfurt unter dem Namen <a href="http://www.frankfurt-gestalten.de/" target="_blank">Frankfurt gestalten</a>. Interessierte, die solche und ähnliche Plattformen in anderen Städten Nordrhein-Westfalens fördern wollen, diskutieren auf der <a href="http://lists.okfn.org/mailman/listinfo/od-nrw" target="_blank">Open Data NRW Mailingliste</a>. Überregionale Anlaufstellen, um sich Mitstreiter für ein solches Projekt zu suchen, ist das <a href="http://opendata-network.org/" target="_blank">Open Data Network</a> und die <a href="http://okfn.de/" target="_blank">Open Knowledge Foundation Deutschland</a>.</p>
-
+	<p>Das jeweilige lokaleRatsinformationssystem der Stadt ist die Quelle der Dokumente, dier hier zu finden sind.</p>
+	<p>Sowas wie "Was passiert bei mir?" gibt es schon länger in Frankfurt unter dem Namen <a href="http://www.frankfurt-gestalten.de/" target="_blank">Frankfurt gestalten</a>. Interessierte, die solche und ähnliche Plattformen in anderen Städten fördern wollen, diskutieren auf der <a href="http://lists.okfn.org/mailman/listinfo/ris" target="_blank">OKF RIS</a>. Überregionale Anlaufstellen, um sich Mitstreiter für ein solches Projekt zu suchen, ist das <a href="http://opendata-network.org/" target="_blank">Open Data Network</a> und die <a href="http://okfn.de/" target="_blank">Open Knowledge Foundation Deutschland</a>.</p>
 </div>
-
-<div class="content bottom">
-	<h2 class="top-nomargin">Impressum und Kontakt</h2>
-
-	<p><strong>Anbieter im Sinne des Telemediengesetzes</strong></p>
-	<p>{{ config.IMPRESSUM_NAME }}<br />
-	{{ config.IMPRESSUM_STREET }}<br />
-	{{ config.IMPRESSUM_CITY }}</p>
-	
-	<p>E-Mail: <a href="mailto:{{ config.IMPRESSUM_MAIL }}">{{ config.IMPRESSUM_MAIL }}</a><br />
-	Telefon: <a href="tel:{{ config.IMPRESSUM_PHONE_URL }}">{{ config.IMPRESSUM_PHONE_DESCR }}</a></p>
-
-</div>
-
 {% endblock %}
