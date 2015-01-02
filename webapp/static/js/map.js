@@ -174,6 +174,8 @@ $(document).ready(function(){
                 choicetext += ' ' + places_filtered[n].address.hamlet
               else if (places_filtered[n].address.village)
                 choicetext += ' ' + places_filtered[n].address.village
+              else if (places_filtered[n].address.county)
+                choicetext += ' ' + places_filtered[n].address.county
               choicelink.text(choicetext);
               choicelink.attr('class', 'choicelink ' + places_filtered[n].osm_id);
               choicelink.mouseover({resultObject:places_filtered[n], mapmarker: marker}, function(evt){
@@ -201,6 +203,8 @@ $(document).ready(function(){
                   entry_string += ' ' + places_filtered[n].address.hamlet
                 else if (evt.data.resultObject.address.village)
                   entry_string += ' ' + places_filtered[n].address.village
+                else if (evt.data.resultObject.address.county)
+                  entry_string += ' ' + places_filtered[n].address.county
                 $('#address').val(entry_string);
                 lastLocationEntry = entry_string;
                 sessionParams = {
