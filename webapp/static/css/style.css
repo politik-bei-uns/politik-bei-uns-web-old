@@ -104,12 +104,10 @@ header {
 
 #logo {
 	float: left;
-	width: 60px
 }
 
 #nametagline {
 	float: left;
-	width: 250px;
 	padding-top: 15px;
 }
 #name {
@@ -794,9 +792,9 @@ form .awesome {
   body { margin: 5px 20px; font-size: 14px;}
   header { min-height: 92px; }
   #logo { width: 280px; }
-  #nametagline { width: 300px; }
   #name { font-size: 200%; }
   #map { height: 580px; }
+  #nametagline { width: 450px; }
   .text { width: 80%;}
   label {display: inline;}
   #home #address { width: 18em; }
@@ -807,7 +805,6 @@ form .awesome {
 
 @media only screen and (min-width: 800px) {
   body { margin: 5px 50px; font-size: 14px; }
-  #nametagline { width: 600px; }
   #home #address { width: 22em; }
   #home #qinput { width: 22em; }
   /*#home #submit { padding-left: 2em; padding-right: 2em;}*/
