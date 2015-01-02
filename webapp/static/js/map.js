@@ -164,21 +164,16 @@ $(document).ready(function(){
                 choicetext += ', ' + places_filtered[n].address.postcode;
                 pc_shown = true;
               }
-              if (places_filtered[n].address.city) {
-                if (!pc_shown)
-                  choicetext += ','
+              if (!pc_shown)
+                choicetext += ','
+              if (places_filtered[n].address.city)
                 choicetext += ' ' + places_filtered[n].address.city
-              }
-              else if (places_filtered[n].address.town) {
-                if (!pc_shown)
-                  choicetext += ','
+              else if (places_filtered[n].address.town)
                 choicetext += ' ' + places_filtered[n].address.town
-              }
-              else if (places_filtered[n].address.village) {
-                if (!pc_shown)
-                  choicetext += ','
+              else if (places_filtered[n].address.hamlet)
+                choicetext += ' ' + places_filtered[n].address.hamlet
+              else if (places_filtered[n].address.village)
                 choicetext += ' ' + places_filtered[n].address.village
-              }
               choicelink.text(choicetext);
               choicelink.attr('class', 'choicelink ' + places_filtered[n].osm_id);
               choicelink.mouseover({resultObject:places_filtered[n], mapmarker: marker}, function(evt){
@@ -196,11 +191,16 @@ $(document).ready(function(){
                   pc_shown = true;
                   entry_string += ', ' + evt.data.resultObject.address.postcode;
                 }
-                if (evt.data.resultObject.address.city) {
-                  if (!pc_shown)
-                    entry_string += ','
-                  entry_string += ' ' + evt.data.resultObject.address.city;
-                }
+                if (!pc_shown)
+                  entry_string += ','
+                if (evt.data.resultObject.address.city)
+                  entry_string += ' ' + places_filtered[n].address.city
+                else if (evt.data.resultObject.address.town)
+                  entry_string += ' ' + places_filtered[n].address.town
+                else if (evt.data.resultObject.address.hamlet)
+                  entry_string += ' ' + places_filtered[n].address.hamlet
+                else if (evt.data.resultObject.address.village)
+                  entry_string += ' ' + places_filtered[n].address.village
                 $('#address').val(entry_string);
                 lastLocationEntry = entry_string;
                 sessionParams = {
