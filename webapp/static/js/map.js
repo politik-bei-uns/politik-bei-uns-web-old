@@ -196,15 +196,15 @@ $(document).ready(function(){
                 if (!pc_shown)
                   entry_string += ','
                 if (evt.data.resultObject.address.city)
-                  entry_string += ' ' + places_filtered[n].address.city
+                  entry_string += ' ' + evt.data.resultObject.address.city
                 else if (evt.data.resultObject.address.town)
-                  entry_string += ' ' + places_filtered[n].address.town
+                  entry_string += ' ' + evt.data.resultObject.address.town
                 else if (evt.data.resultObject.address.hamlet)
-                  entry_string += ' ' + places_filtered[n].address.hamlet
+                  entry_string += ' ' + evt.data.resultObject.address.hamlet
                 else if (evt.data.resultObject.address.village)
-                  entry_string += ' ' + places_filtered[n].address.village
+                  entry_string += ' ' + evt.data.resultObject.address.village
                 else if (evt.data.resultObject.address.county)
-                  entry_string += ' ' + places_filtered[n].address.county
+                  entry_string += ' ' + evt.data.resultObject.address.county
                 $('#address').val(entry_string);
                 lastLocationEntry = entry_string;
                 sessionParams = {
