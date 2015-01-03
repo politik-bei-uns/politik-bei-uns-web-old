@@ -1,35 +1,31 @@
-# Offenes Köln
-
-## Aktueller Hinweis
-
-Aktuell ist Version 2 von Offenes Köln in Arbeit. Wer den aktuellsten Stand auscheckt, bekommt **keine funktionsfähige Software**, und die Funktionen passen nicht zur Dokumentation. Der letzte dokumentierte Stand ist als Version "v1.0" getaggt und kann über das Tag ausgecheckt werden.
-
-Version 2 wird grundlegende Änderungen unter der Oberfläche bieten. Die Funktionalitäten aus Nutzersicht werden weitestgehend bestehen bleiben.
-
+# Offenes Ratsinformationssystem
 
 ## Über dieses Repository
 
-Dies ist das github-Repository für [Offenes Köln](http://offeneskoeln.de/).
+Dies ist das github-Repository für das [Offene Ratsinformationssystem](http://was-passiert-bei-mir.de/).
 
 Hier gibt es:
 
-- Dokumentation (im [Wiki](https://github.com/marians/offeneskoeln/wiki))
-- [Issue-Tracking](https://github.com/marians/offeneskoeln/issues), also die Erfassung und Zuweisung von Fehlern
+- Dokumentation (im [Wiki](https://github.com/okfde/ris-web/wiki))
+- Die API (auf der [Oparl Seite](http://oparl.org/))
+- [Issue-Tracking](https://github.com/okfde/ris-web/issues), also die Erfassung und Zuweisung von Fehlern
+- Die [Installationsanleitung](https://github.com/okfde/ris-web/blob/master/INSTALL.txt)
 - Quellcode
 
 Der Bereich **Quellcode** enthält folgende Dateien:
 
-- db: Datenbankschema
-- webapp: Die Web-Applikation offeneskoeln.de
-- solr-conf: Konfigurationsdateien für den Solr Such-Dienst
+- webapp: Die Web-Applikation
 - scripts: Unterstützende Werkzeuge und Helferlein
+- config: Startkonfiguration, Startdatenbank
 
 Der **Scraper**, mit dem die Daten aus dem Ratsinformationssystem der Stadt Köln ausgelesen werden, ist ein eigenes Projekt auf Github:
 
-[https://github.com/marians/cologne-ris-scraper](https://github.com/marians/cologne-ris-scraper)
-
-Weitere Informationen findest Du im [https://github.com/marians/offeneskoeln/wiki/_pages](Wiki), insbesondere eine [https://github.com/marians/offeneskoeln/wiki/Leitfaden-f%C3%BCr-Entwickler](Anleitung zum Aufsetzen einer Entwicklungsumgebung). 
+[https://github.com/okfde/ris-scraper/](https://github.com/okfde/ris-scraper/)
 
 ###Lizenz
 
-Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/marians/offeneskoeln/blob/master/LIZENZ.txt).
+Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/okfde/ris-web/blob/master/LIZENZ.txt).
+
+###Geschichte
+
+Dieses Projekt ist eine Weiterentwicklung des von Marian Steinbach gestarteten Projektes [Offenes Köln](https://github.com/marians/offeneskoeln/)
