@@ -28,7 +28,7 @@ chown ris:ris -R /srv/www/ris-web/
 # Webinterface
 sudo -i -u ris
 cd /srv/www/ris-web/
-git clone https://github.com/OpenRuhr/ris-web.git
+git clone https://github.com/okfde/ris-web.git
 cp config_dist.py config.py
 vim config.py # Set Values
 
@@ -40,4 +40,4 @@ pip install -r requirements.txt
 # Scraper
 sudo -i -u ris
 cd /srv/www/ris-web/
-git clone https://github.com/OpenRuhr/ris-scraper.git
+git clone https://github.com/okfde/ris-scraper.git
