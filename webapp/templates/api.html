@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
-{% block title %}API von "Was passiert bei mir?"{% endblock %}
-{% block ogtitle %}API von "Was passiert bei mir?"{% endblock %}
+{% block title %}API | {{ config.site_name }}{% endblock %}
+{% block ogtitle %}API | {{ config.site_name }}{% endblock %}
 {% block meta_description %}Für echte Offenheit braucht es offene Schnittstellen. Hier gibt es Informationen über unsere Webservice API.{% endblock %}
 
 {% block riscontent %}
@@ -20,6 +20,11 @@
   <p class="text">Alle hier präsentierten Daten sind über die <a href="http://oparl.org/">OParl-Schnittstelle</a> zu abrufbar. <a href="https://github.com/OParl/specs">Die Dokumentation befindet sich auf GitHub</a>, ebenso wie <a href="https://github.com/OParl/specs/issues">die Diskussion über die API</a>. Mitarbeit ist erwünscht! Die Basis-URL der Schnittstelle lautet:</p>
   
   <blockquote class="nice"><a href="/oparl">/oparl</a></blockquote>
+  <p>Bislang ist bei der OParl-API-Ausgabe noch folgendes zu beachten:</p>
+  <ul>
+    <li>Die API auf {{ config.site_host }} ist nicht exakt OParl, einige Features fehlen noch.</li>
+    <li>OParl selbst ist noch im Draft-Status, d.h. es können sich noch das eine oder andere ändern.</li>
+  </ul>
 </div>
 <div class="content bottom">
 
