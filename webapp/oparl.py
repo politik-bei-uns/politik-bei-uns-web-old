@@ -58,17 +58,17 @@ def oparl_general():
     "@type": "OParlSystem",
     "bodies": "%s/oparl/body%s" % (app.config['api_url'], generate_postfix(params)),
     "contact": {
-        "email": "info@openruhr.de",
-        "name": "Initiative OpenRuhr"
+      "email": "ernesto.ruge@okfn.de",
+      "name": "Ernesto Ruge, Open Knowledge Foundation Deutschland e.V."
     }, 
-    "info_url": "http://openruhr.de/",
-    "name": "OpenRuhr Oparl Service",
+    "info_url": "http://politik-bei-uns.de/",
+    "name": "OKF-DE Oparl Service",
     "new_objects": "%s/feeds/new" % app.config['api_url'],
     "oparl_version": "http://oparl.org/spezifikation/1.0/",
-    "product_url": "http://openruhr.de/",
+    "product_url": "http://politik-bei-uns.de/",
     "removed_objects": "%s/feeds/removed" % app.config['api_url'],
     "updated_objects": "%s/feeds/updated" % app.config['api_url'],
-    "vendor_url": "http://openruhr.de/"
+    "vendor_url": "http://politik-bei-uns.de/"
   })
 
 

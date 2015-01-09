@@ -6,7 +6,7 @@
 {% block riscontent %}
 
 <div class="content top">
-	<h1>Was passiert bei mir?</h1>
+	<h1>Was passiert bei mir vor Ort?</h1>
 	<ul>
 		<li>Warum ist die Baustelle da?</li>
 		<li>Was macht die Stadt gegen wilde Müllkippen?</li>
@@ -48,14 +48,14 @@
 	</div>
 </div>
 <div class="content middle" id="team">
-	<h2 class="top-nomargin">Das Team hinter Offenes Köln</h2>
+	<h2 class="top-nomargin">Das Team hinter {{ config.site_name }}</h2>
 	<div style="text-align: center; margin-top: 3em; margin-bottom: 2em">
 		<div style="overflow: auto; width: 750px; margin: 2em auto; text-align: left;">
 			<div style="width: 200px; float: left;">
 				<img src="/static/img/team/ernesto.jpg" width="150" height="150" alt="Ernesto" style="border: 0"/>
 			</div>
 			<div style="width: 400px; float: left;">
-				Ernesto Ruge ist einer der Gründer von der Initiative <a href="http://openruhr.de/">OpenRuhr</a>. Er hat Marians Offenes Köln zu "Was passiert bei mir?" weiterentwickelt. Er entwickelt gerne Daten-Anwendungen, die einen Mehrwert für Menschen geben, und möchte so Beteiligungsmöglichkeiten verbessern.<br /><br />
+				Ernesto Ruge ist einer der Gründer von der Initiative <a href="http://openruhr.de/">OpenRuhr</a>. Er hat Marians Offenes Köln zu {{ config.site_name }} weiterentwickelt. Er entwickelt gerne Daten-Anwendungen, die einen Mehrwert für Menschen geben, und möchte so Beteiligungsmöglichkeiten verbessern.<br /><br />
 				Ernestos <a href="http://sectio-aurea.org/" target="_blank">Blog</a> und <a href="https://twitter.com/the_infinity" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
@@ -64,7 +64,7 @@
 				<img src="/static/img/team/marian.jpg" width="150" height="150" alt="Marian" style="border: 0"/>
 			</div>
 			<div style="width: 400px; float: left;">
-				Marian Steinbach hat den Vorgänger von "Was passiert bei mir?" mit dem Namen "Offenes Köln" ins Leben gerufen. Als freiberuflicher Interaction Designer interessiert er sich dafür, wie man Informationen, die <em>eigentlich</em> öffentlich und zugänglich sind, <em>tatsächlich</em> zugänglich macht, so dass Menschen sie wirklich benutzen können und wollen. In der Hinsicht gibt es bei Offenes Köln genug zu tun.<br /><br />
+				Marian Steinbach hat den Vorgänger von {{ config.site_name }} mit dem Namen "Offenes Köln" ins Leben gerufen. Als freiberuflicher Interaction Designer interessiert er sich dafür, wie man Informationen, die <em>eigentlich</em> öffentlich und zugänglich sind, <em>tatsächlich</em> zugänglich macht, so dass Menschen sie wirklich benutzen können und wollen. In der Hinsicht gibt es bei Offenes Köln genug zu tun.<br /><br />
 				Marians <a href="http://www.sendung.de/" target="_blank">Blog</a> und <a href="https://twitter.com/#!/MarianSteinbach" target="_blank">Twitter Account</a>.
 			</div>
 		</div>
@@ -73,7 +73,7 @@
 				<img src="/static/img/team/du.jpg" width="150" height="150" alt="Du" style="border: 0"/>
 			</div>
 			<div style="width: 400px; float: left;">
-				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an "Was passiert bei mir?" mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
+				Hier könnte <strong>Dein Name</strong> stehen. Wenn Du an {{ config.site_name }} mitwirken möchtest, melde Dich auf einem der vielen Wege möglichen Wege!
 			</div>
 		</div>
 	</div>

@@ -2,7 +2,7 @@
 
 ## Über dieses Repository
 
-Dies ist das github-Repository für das [Offene Ratsinformationssystem](http://was-passiert-bei-mir.de/).
+Dies ist das github-Repository für das [Offene Ratsinformationssystem](http://politik-bei-uns.de/).
 
 Hier gibt es:
 
@@ -18,7 +18,7 @@ Der Bereich **Quellcode** enthält folgende Dateien:
 - scripts: Unterstützende Werkzeuge und Helferlein
 - config: Startkonfiguration, Startdatenbank
 
-Der **Scraper**, mit dem die Daten aus dem Ratsinformationssystem der Stadt Köln ausgelesen werden, ist ein eigenes Projekt auf Github:
+Der **Scraper**, mit dem die Daten aus dem Ratsinformationssystemen der Unternehmen SessionNet und AllRis ausgelesen werden, ist ein eigenes Projekt auf Github:
 
 [https://github.com/okfde/ris-scraper/](https://github.com/okfde/ris-scraper/)
 
