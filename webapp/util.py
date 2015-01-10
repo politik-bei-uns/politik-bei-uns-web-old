@@ -12,7 +12,55 @@ import sys
 from flask import request
 from collections import OrderedDict
 
-from webapp import app
+from webapp import app, mongo
+
+def verify_created_modified():
+  result = []
+  collections = ['body', 'organization', 'person', 'membership', 'meeting', 'consultation', 'agendaitem', 'paper', 'file', 'region']
+  for collection in collections:
+    print '########## now working at %s ##########' % collection
+    mongo_collection = getattr(mongo.db, collection)
+    for item in mongo_collection.find({},{'_id':1,'lastModified':1,'modified':1,'created':1}):
+      state = ['ID: %s' % item['_id']]
+      # modified
+      if 'modified' in item:
+        state.append('modified found')
+      else:
+        if 'lastModified' in item:
+          state.append('modified insertet with lastModified')
+          mongo_collection.update({'_id': item['_id']}, {'$set': {'modified': item['lastModified']}})
+        else:
+          state.append('modified insertet with datetime')
+          mongo_collection.update({'_id': item['_id']}, {'$set': {'modified': datetime.datetime.now()}})
+      # created
+      if 'created' in item:
+        state.append('created found')
+      else:
+        if 'createdAt' in item:
+          state.append('created insertet with createdAt')
+          mongo_collection.update({'_id': item['_id']}, {'$set': {'created': item['createdAt']}})
+        elif 'modified' in item:
+          state.append('created insertet with modified')
+          mongo_collection.update({'_id': item['_id']}, {'$set': {'created': item['modified']}})
+        elif 'lastModified' in item:
+          state.append('created insertet with lastModified')
+          mongo_collection.update({'_id': item['_id']}, {'$set': {'created': item['lastModified']}})
+        else:
+          state.append('created insertet with datetime')
+          mongo_collection.update({'_id': item['_id']}, {'$set': {'created': datetime.datetime.now()}})
+      # lastModified
+      if 'lastModified' in item:
+        state.append('lastModified deleted')
+        mongo_collection.update({'_id': item['_id']}, {'$unset': {'lastModified':1}})
+      else:
+        state.append('no lastModified found')
+      # createdAt
+      if 'createdAt' in item:
+        state.append('createdAt deleted')
+        mongo_collection.update({'_id': item['_id']}, {'$unset': {'createdAt':1}})
+      else:
+        state.append('no createdAt found')
+      print ', '.join(state)
 
 def rfc1123date(value):
   """

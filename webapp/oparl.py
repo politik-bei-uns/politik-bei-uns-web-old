@@ -56,21 +56,45 @@ def oparl_general():
   return oparl_basic(lambda params: {
     "@id": "de.openruhr",
     "@type": "OParlSystem",
-    "bodies": "%s/oparl/body%s" % (app.config['api_url'], generate_postfix(params)),
-    "contact": {
-      "email": "ernesto.ruge@okfn.de",
-      "name": "Ernesto Ruge, Open Knowledge Foundation Deutschland e.V."
-    }, 
-    "info_url": "http://politik-bei-uns.de/",
+    "body": "%s/oparl/body%s" % (app.config['api_url'], generate_postfix(params)),
+    "contactEmail": "ernesto.ruge@okfn.de",
+    "contactName": "Ernesto Ruge, Open Knowledge Foundation Deutschland e.V.",
     "name": "OKF-DE Oparl Service",
-    "new_objects": "%s/feeds/new" % app.config['api_url'],
-    "oparl_version": "http://oparl.org/spezifikation/1.0/",
-    "product_url": "http://politik-bei-uns.de/",
-    "removed_objects": "%s/feeds/removed" % app.config['api_url'],
-    "updated_objects": "%s/feeds/updated" % app.config['api_url'],
-    "vendor_url": "http://politik-bei-uns.de/"
+    "oparlVersion": "http://oparl.org/spezifikation/1.0/",
+    "newObjects": "%s/feeds/new" % app.config['api_url'],
+    "product": "http://politik-bei-uns.de/",
+    "removedObjects": "%s/feeds/removed" % app.config['api_url'],
+    "updatedObjects": "%s/feeds/updated" % app.config['api_url'],
+    "vendor": "http://politik-bei-uns.de/"
   })
 
+@app.route('/oparl/feeds/new')
+def oparl_feed_new():
+  return oparl_basic(oparl_feed_new_data)
+
+def oparl_feed_new_data(params):
+  ret = {
+    'items': [],
+    'itemsPerPage': 100,
+    'nextPage': "%s/feeds/new?p=%s" % (app.config['api_url'], params['page'] + 1)
+  }
+  if params['page'] > 1:
+    ret['fistPage'] = "%s/feeds/new" % (app.config['api_url'])
+  if params['page'] == 2:
+    ret['prevPage'] = "%s/feeds/new" % (app.config['api_url'])
+  if params['page'] > 2:
+    ret['prevPage'] = "%s/feeds/new?p=%s" % (app.config['api_url'], params['page'] - 1)
+  result = db.get_all_new()
+  
+  return result
+
+@app.route('/oparl/feeds/removed')
+def oparl_feed_removed():
+  pass
+
+@app.route('/oparl/feeds/updated')
+def oparl_feed_updated():
+  pass
 
 ####################################################
 # body
@@ -824,24 +848,23 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
   extended_info = extended_info == '1'
   if extended_info:
     request_info['i'] = 1
-  page = request.args.get('p')
+  page = request.args.get('page')
   try:
     page = int(page)
   except (ValueError, TypeError):
     page = 1
-  request_info['p'] = page
-  ret = {
-    'status': 0,
-    'duration': int((time.time() - start_time) * 1000),
-    'request': request_info,
-    'response': {}
-  }
+  request_info['page'] = page
   params.update(request_info)
   response = content_fuction(params)
   if direct_output:
     return response
   if extended_info:
-    ret['response'] = response
+    ret = {
+      'status': 0,
+      'duration': int((time.time() - start_time) * 1000),
+      'request': request_info,
+      'response': response
+    }
   else:
     ret = response
   json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
