@@ -110,7 +110,7 @@ def generate_sitemaps(config):
     for paper in db.paper.find({'body': DBRef('body', body)}):
       thisfile = {
         'path': "%s/paper/%s" % (config['base_url'], paper['_id']),
-        'lastmod': paper['lastModified']
+        'lastmod': paper['modified']
       }
       urls.append(thisfile)
 

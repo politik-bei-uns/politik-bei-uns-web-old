@@ -84,7 +84,7 @@ def generate_georeferences(config, db, options):
     for paper in db.paper.find(query):
       to_update = False
       # Datumsabgleich der letzten Modifizierung der Session
-      if paper['lastModified'] > paper['georeferencesGenerated']:
+      if paper['modified'] > paper['georeferencesGenerated']:
         to_update = True
       # Datumsabgleich der generierten Fulltexts
       if 'mainFile' in paper:
@@ -147,7 +147,8 @@ def generate_georeferences_for_paper(config, paper_id, db):
   now = datetime.datetime.utcnow()
   update = {
     '$set': {
-      'georeferencesGenerated': now
+      'georeferencesGenerated': now,
+      'modified': now
     }
   }
   update['$set']['georeferences'] = result

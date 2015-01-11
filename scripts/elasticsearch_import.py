@@ -100,8 +100,8 @@ def index_paper(config, index, paper_id):
   }
   if 'publishedDate' in paper:
     result['publishedDate'] = paper['publishedDate']
-  if 'lastModified' in paper:
-    result['lastModified'] = paper['lastModified']
+  if 'modified' in paper:
+    result['modified'] = paper['modified']
   if 'originalId' in paper:
     result['originalId'] = paper['originalId']
   if 'reference' in paper:

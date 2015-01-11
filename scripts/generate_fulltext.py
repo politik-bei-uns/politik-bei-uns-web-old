@@ -121,7 +121,7 @@ def generate_fulltext_for_file(db, config, file_id):
   update = {
     '$set': {
       'fulltextGenerated': now,
-      'lastModified': now
+      'modified': now
     }
   }
   if text is None or text == '':

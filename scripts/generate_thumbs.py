@@ -259,7 +259,7 @@ def generate_thumbs_for_file(db, config, body_id, file_id):
     '$set': {
       'thumbnails': thumbnails,
       'thumbnailsGenerated': now,
-      'lastModified': now
+      'modified': now
     }
   })
   STATS['thumbs_created_for_n_attachments'] += 1

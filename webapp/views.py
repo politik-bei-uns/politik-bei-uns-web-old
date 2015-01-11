@@ -194,10 +194,10 @@ def suche_feed():
       description = 'Art des Papers: ' + paper['paperType'] + '<br />'
     if 'publishedDate' in paper:
       description += u"Erstellt am: %s<br />" % dateutil.parser.parse(paper['publishedDate']).strftime('%d.%m.%Y')
-    if 'lastModified' in paper:
-      description += u"Zuletzt geändert am: %s<br />" % dateutil.parser.parse(paper['lastModified']).strftime('%d.%m.%Y')
+    if 'modified' in paper:
+      description += u"Zuletzt geändert am: %s<br />" % dateutil.parser.parse(paper['modified']).strftime('%d.%m.%Y')
     
-    etree.SubElement(item, "pubDate").text = util.rfc1123date(paper['lastModified'] if 'lastModified' in paper else datetime.datetime.now())
+    etree.SubElement(item, "pubDate").text = util.rfc1123date(paper['modified'] if 'modified' in paper else datetime.datetime.now())
     etree.SubElement(item, "title").text = paper['name'] if 'name' in paper else 'Kein Titel'
     etree.SubElement(item, "description").text = description
     etree.SubElement(item, "link").text = paper_link
