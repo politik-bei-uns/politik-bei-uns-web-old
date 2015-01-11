@@ -81,7 +81,7 @@ def generate_fulltext(db, config, body_id):
     if file_data['uploadDate'] > single_file['fulltextGenerated']:
       # Volltext muss erneuert werden
       STATS['attachments_with_outdated_fulltext'] += 1
-      generate_fulltext_for_file(db, config,file_data['_id'])
+      generate_fulltext_for_file(db, config, single_file['_id'])
 
   # Files ohne Volltext
   query = {'fulltextGenerated': {'$exists': False}, 'body': DBRef('body', ObjectId(body_id))}
