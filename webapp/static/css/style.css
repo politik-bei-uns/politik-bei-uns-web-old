@@ -791,7 +791,7 @@ form .awesome {
   /* Gilt auch fuer iPad im vertikalen Modus */
   body { margin: 5px 20px; font-size: 14px;}
   header { min-height: 92px; }
-  #logo { width: 350px; }
+  #logo { width: 200px; }
   #name { font-size: 200%; }
   #map { height: 580px; }
   #nametagline { width: 450px; }
