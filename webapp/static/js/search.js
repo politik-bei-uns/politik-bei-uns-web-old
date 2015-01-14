@@ -193,7 +193,7 @@ $(document).ready(function() {
   }
   
   function displaySearchErrorMessage(){
-    $('#search .result').append('<h2>Fehler bei der Suche</h2><p>Es ist ein unerwarteter Fehler aufgetreten. Bitte probier es noch einmal.</p><p>Wenn das Problem weiterhin besteht, bitte kopiere den Inhalt der Adresszeile in eine E-Mail und sende sie an <a href="mailto:kontakt@offeneskoeln.de">kontakt@offeneskoeln.de</a>. Vielen Dank!</p>');
+    $('#search .result').append('<h2>Fehler bei der Suche</h2><p>Es ist ein unerwarteter Fehler aufgetreten. Bitte probier es noch einmal.</p><p>Wenn das Problem weiterhin besteht, bitte kopiere den Inhalt der Adresszeile in eine E-Mail und sende sie an <a href="kontakt@politik-bei-uns.de">kontakt@politik-bei-uns.de</a>. Vielen Dank!</p>');
   }
   
   function displaySearchResult(data) {

@@ -266,7 +266,7 @@ $(document).ready(function(){
     if (reason == 'NEED_DETAILS') {
       msg.append('Bitte gib den Ort genauer an, z.B. durch Angabe einer Hausnummer oder PLZ.');
     } else if (reason == 'NOT_FOUND') {
-      msg.append('Der angegebene Ort wurde nicht gefunden. Vielleicht hast Du ihn falsch geschrieben?');
+      msg.append('Der angegebene Ort wurde nicht gefunden. Vielleicht haben Sie ihn falsch geschrieben?');
     } else {
       msg.append('Bei der Ortssuche ist ein unbekannter Fehler ausgetreten. Bitte versuche es noch einmal.');
     }

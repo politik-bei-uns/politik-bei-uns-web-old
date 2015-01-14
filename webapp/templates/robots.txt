@@ -2,12 +2,12 @@
 #
 # Bitte nur 1 Thread, dem Server und anderen Nutzern zuliebe!
 #
-# Wenn Du an strukturierten Daten interessiert bist, schau Dir
-# bitte
+# Wenn Sie an strukturierten Daten interessiert sind, schauen Sie
+# sich bitte
 #
-#    http://offeneskoeln.de/api/
+#    https://politik-bei-uns.de/api/
 #
-# an! Das koennte Dir Zeit und uns Server-Ressourcen sparen. :)
+# an! Das koennte Ihnen Zeit und uns Server-Ressourcen sparen. :)
 
 Sitemap: /static/sitemap/sitemap.xml
 

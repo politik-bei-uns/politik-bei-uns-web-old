@@ -54,7 +54,7 @@ from webapp import app
 @app.route('/oparl')
 def oparl_general():
   return oparl_basic(lambda params: {
-    "@id": "de.openruhr",
+    "@id": "de.politik-bei-uns",
     "@type": "OParlSystem",
     "body": "%s/oparl/body%s" % (app.config['api_url'], generate_postfix(params)),
     "contactEmail": "ernesto.ruge@okfn.de",
