@@ -489,7 +489,8 @@ def oparl_agendaItem_data(params):
   if len(data) == 1:
     data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
     data[0]['meeting'] = generate_single_backref_url(params=params, get='get_meeting', type='meeting', reverse_type='agendaItem', id=params['_id'])
-    data[0]['consultation'] = generate_single_url(params=params, type='consultation', id=data[0]['consultation'].id)
+    if 'consultation' in data[0]:
+      data[0]['consultation'] = generate_single_url(params=params, type='consultation', id=data[0]['consultation'].id)
     data[0]['@type'] = 'OParlAgendaItem'
     data[0]['@id'] = data[0]['_id']
     return data[0]
