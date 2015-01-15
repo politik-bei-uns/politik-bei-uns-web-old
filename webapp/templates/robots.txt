@@ -9,7 +9,7 @@
 #
 # an! Das koennte Ihnen Zeit und uns Server-Ressourcen sparen. :)
 
-Sitemap: /static/sitemap/sitemap.xml
+Sitemap: {{ config.base_url }}/static/sitemap/sitemap.xml
 
 User-agent: *
 Disallow: /suche/
