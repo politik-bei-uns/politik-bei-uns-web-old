@@ -88,12 +88,12 @@ def generate_sitemaps(config):
     for file in db.file.find({'body': DBRef('body', body), 'depublication': {'$exists': False}}):
       fileentry = db.fs.files.find_one(file['file'].id)
       thisfile = {
-        'path': "%s/oparl/file/%s/downloadUrl" % (config['base_url'], file['_id']),
+        'path': "%s/anhang/%s" % (config['base_url'], file['_id']),
         'lastmod': fileentry['uploadDate']
       }
       urls.append(thisfile)
 
-    # create sitemap(s) with individual attachment URLs
+    # create sitemap(s) with individual file URLs
     sitemap_count = 1
     while len(urls) > 0:
       shortlist = []
@@ -134,8 +134,8 @@ def generate_sitemaps(config):
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">""")
   for sitemap_name in sitemaps:
     f.write("""\n  <sitemap>
-      <loc>%s_%s.xml.gz</loc>
-  </sitemap>""" % (config['sitemap_folder'], sitemap_name))
+      <loc>%s/static/sitemap/%s.xml.gz</loc>
+  </sitemap>""" % (config['base_url'], sitemap_name))
   f.write("\n</sitemapindex>\n")
   f.close()
 
