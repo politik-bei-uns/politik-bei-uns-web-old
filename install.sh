@@ -47,8 +47,7 @@ apt-get install -y mongodb-10gen
 
 # More Packages
 echo "Installiere weitere Pakete"
-apt-get install -y git memcached python-virtualenv build-essential python-dev libxml2-dev libxslt1-dev ghostscript poppler-utils libpng12-dev libfreetype6-dev protobuf-compiler libprotobuf-dev
-
+apt-get install -y git memcached python-virtualenv build-essential python-dev libxml2-dev libxslt1-dev ghostscript poppler-utils libpng12-dev libfreetype6-dev protobuf-compiler libprotobuf-dev libjpeg-dev
 echo "Füge Systemnutzer hinzu und erstelle Pfade"
 
 mkdir $basepath/ris-scraper
