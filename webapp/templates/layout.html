@@ -39,25 +39,25 @@ _gaq.push(['_gat._anonymizeIp']);
 _gaq.push(['_trackPageview']);
 
 (function() {
-	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
 </script>
 {% elif config['tracking'] == 'piwik' %}
 <!-- Piwik -->
 <script type="text/javascript">
-	var _paq = _paq || [];
-	_paq.push(["trackPageView"]);
-	_paq.push(["enableLinkTracking"]);
+  var _paq = _paq || [];
+  _paq.push(["trackPageView"]);
+  _paq.push(["enableLinkTracking"]);
 
-	(function() {
-		var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{{ config['piwik_host'] }}/";
-		_paq.push(["setTrackerUrl", u+"piwik.php"]);
-		_paq.push(["setSiteId", "{{ config['piwik_site_id'] }}"]);
-		var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-		g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-	})();
+  (function() {
+    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://{{ config['piwik_host'] }}/";
+    _paq.push(["setTrackerUrl", u+"piwik.php"]);
+    _paq.push(["setSiteId", "{{ config['piwik_site_id'] }}"]);
+    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
+    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+  })();
 </script>
 <!-- End Piwik Code -->
 {% endif %}
@@ -65,42 +65,42 @@ _gaq.push(['_trackPageview']);
 
 {% block content %}
 <div id="container">
-	<header>
-		<div id="topnav"><a href="/">Startseite</a> | <a href="http://openruhr.de/">Blog</a> | <a href="/impressum/">Impressum</a> | <a href="/datenschutz/">Datenschutz</a></div>
-		<div id="logo"><a href="/"><img src="/static/img/logo/PolitikBeiUns.png" alt="Politik Bei Uns Logo" /></a></div>
-		<div id="nametagline">
-			<div><a id="name" href="/">Offenes Ratsinformationssystem</a></div>
-			<div id="tagline">Transparente Kommunalpolitik für ganz Deutschland</div>
-		</div>
-	</header>
-	<div id="main" role="main">
-		<noscript>
-			<p>Sie müssen JavaScript aktivieren, um diese Site nutzen zu können.</p>
-		</noscript>
-		{% block riscontent %}{% endblock %}
-	</div>
-	<footer>
-		<div id="footer">
-			<ul class="column">
-				<li><a href="/">Startseite</a></li>
-			</ul>
-			<ul class="column">
-					<li><a href="/hilfe/">Hilfe</a></li>
-			</ul>
-			<ul class="column">
-					<li><a href="/ueber/">Über uns</a></li>
-			</ul>
-			<ul class="column">
-					<li><a href="/daten/">Daten</a></li>
-			</ul>
-			<ul class="column">
-					<li><a href="/api/">API</a></li>
-			</ul>
-			<ul class="column">
-				<li><a href="/disclaimer/" class="warn">Datenqualität/Haftungsausschluss</a></li>
-			</ul>
-		</div>
-	</footer>
+  <header>
+    <div id="topnav"><a href="/">Startseite</a> | <a href="http://openruhr.de/">Blog</a> | <a href="/impressum/">Impressum</a> | <a href="/datenschutz/">Datenschutz</a></div>
+    <div id="logo"><a href="/"><img src="/static/img/logo/PolitikBeiUns.png" alt="Politik Bei Uns Logo" /></a></div>
+    <div id="nametagline">
+      <div><a id="name" href="/">Offenes Ratsinformationssystem</a></div>
+      <div id="tagline">Transparente Kommunalpolitik für ganz Deutschland</div>
+    </div>
+  </header>
+  <div id="main" role="main">
+    <noscript>
+      <p>Sie müssen JavaScript aktivieren, um diese Site nutzen zu können.</p>
+    </noscript>
+    {% block riscontent %}{% endblock %}
+  </div>
+  <footer>
+    <div id="footer">
+      <ul class="column">
+        <li><a href="/">Startseite</a></li>
+      </ul>
+      <ul class="column">
+          <li><a href="/hilfe/">Hilfe</a></li>
+      </ul>
+      <ul class="column">
+          <li><a href="/ueber/">Über uns</a></li>
+      </ul>
+      <ul class="column">
+          <li><a href="/daten/">Daten</a></li>
+      </ul>
+      <ul class="column">
+          <li><a href="/api/">API</a></li>
+      </ul>
+      <ul class="column">
+        <li><a href="/disclaimer/" class="warn">Datenqualität/Haftungsausschluss</a></li>
+      </ul>
+    </div>
+  </footer>
 </div>
 {% endblock %}
 
