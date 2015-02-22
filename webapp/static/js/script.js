@@ -5,7 +5,7 @@ var OpenRIS = {
   a: 6378137,
   b: (6378137 * 297.257223563) / 298.257223563,
   
-  region: null,
+  region: {},
   start_method_queue: new Array(),
   
   monthstr: {
@@ -69,7 +69,8 @@ var OpenRIS = {
   
   
   regionLoad: function() {
-    OpenRIS.updateRegion();
+    // copy region_data in region object
+    this.region = region_data;
     // region click
     $('#change-region').click(function(){
       $.getJSON('/api/regions', function(data) {
@@ -81,7 +82,7 @@ var OpenRIS = {
             .click(
               {'region': region},
               function(event) {
-                region_data = {
+                OpenRIS.region = {
                   'id': event.data.region.id,
                   'name': event.data.region.name,
                   'lat': event.data.region.lat,
@@ -90,14 +91,13 @@ var OpenRIS = {
                   'type': event.data.region.type,
                   'keyword': event.data.region.keyword
                 }
-                //OpenRIS.region = event.data.region;
                 $('#region-choice').html('');
                 $('#region-question').css({'display': 'block'});
-                OpenRIS.updateRegion();
+                // update region name
+                $('#region-current').text(OpenRIS.region.name);
                 sessionParams = {
-                  'region_id': region_data['id']
+                  'region_id': OpenRIS.region.id
                 };
-                //setUserPosition(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon));
                 OpenRIS.session(sessionParams, function() {});
                 if (typeof(OpenRIS.post_region_change) == 'function') {
                   OpenRIS.post_region_change();
@@ -108,29 +108,6 @@ var OpenRIS = {
         });
       });
     });
-  },
-
-  updateRegion: function() {
-    // update region name
-    $('#region-current').text(region_data.name);
-    // update street description
-    if (region_data.type == 1)
-      $('#address-label').text('Straße:');
-    else
-      $('#address-label').text('Straße und Stadt:');
-    // update search examples
-    if ($('#search-examples')) {
-      $('#search-examples').html('');
-      $('#search-examples').append(document.createTextNode('Beispiele: '));
-      $.each(region_data.keyword, function(id, keyword){
-        $('<a/>')
-          .text(keyword)
-          .attr({'href': '/suche/?q=' + encodeURI(keyword)})
-          .appendTo('#search-examples');
-        if (region_data.keyword.length > id + 1)
-          $('#search-examples').append(document.createTextNode(', '));
-      });
-    }
   },
   
   /**
@@ -173,7 +150,7 @@ var OpenRIS = {
    * Takes an object of standard search parameters and deletes those which are default or null
    */
   processSearchParams: function(params){
-    params['r'] = region_data['id']
+    params['r'] = OpenRIS.region.id
     if (typeof params['q'] === 'undefined'
       || params['q'] == null
       || params['q'] === ''

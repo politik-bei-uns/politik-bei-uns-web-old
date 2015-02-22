@@ -5,23 +5,24 @@
 
 {% block scripts %}
 {{ super() }}
+
 <script type="text/javascript" src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/ajaxq.js') }}"></script>
-{% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}
 <script>
+{% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}
 var region_data = {
-	'id': '{{ region_id }}',
-	'name': '{{ config['regions'][region_id]['name'] }}',
-	'type': {{ config['regions'][region_id]['type'] }},
-	'lat': {{ config['regions'][region_id]['lat'] }},
-	'lon': {{ config['regions'][region_id]['lon'] }},
-	'zoom': {{ config['regions'][region_id]['zoom'] }},
-	'keyword': [{% for keyword in config['regions'][region_id]['keyword'] %}'{{ keyword }}', {% endfor %}]
+  'id': '{{ region_id }}',
+  'name': '{{ config['regions'][region_id]['name'] }}',
+  'type': {{ config['regions'][region_id]['type'] }},
+  'lat': {{ config['regions'][region_id]['lat'] }},
+  'lon': {{ config['regions'][region_id]['lon'] }},
+  'zoom': {{ config['regions'][region_id]['zoom'] }},
+  'keyword': [{% for keyword in config['regions'][region_id]['keyword'] %}'{{ keyword }}', {% endfor %}]
 }
 
 var search_data = {
-	'address': {% if session['address'] %}'{{ session['address'] }}'{% else %}null{% endif %},
-	'osm_id': {% if session['osm_id'] %}{{ session['osm_id'] }}{% else %}null{% endif %}
+  'address': {% if session['address'] %}'{{ session['address'] }}'{% else %}null{% endif %},
+  'osm_id': {% if session['osm_id'] %}{{ session['osm_id'] }}{% else %}null{% endif %}
 }
 
 var CONF = {
@@ -35,35 +36,36 @@ var CONF = {
 {% endblock %}
 
 {% block riscontent %}
+{% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}
 <div id="home">
-	<div class="content top">
-		<div id="region-prompt">
-			<div id="region-question" class="question">Ausgewählte Region: <span id="region-current">Deutschland</span> <span id="change-region" class="awesome extrawide">Ändern</span></div>
-			<div id="region-choice"></div>
-		</div>
-	</div>
-	<div id="position-form-container" class="content middle">
-		<div id="position-prompt">
-			<form id="position-prompt-form" action="/" method="GET">
-				<div class="question">Sehen Sie sich an, was die Politik in Ihrer Umgebung macht:</div>
-				<div>
-					<span class="mobilerow"><label for="address" id='address-label'>Straße und Stadt:</label> <input id="address" type="text" name='address' title="Straße und Stadt, in der Sie wohnen oder für die Sie sich interessieren"/></span>
-					<a href="#" id='position-prompt-submit' class="awesome extrawide">Anzeigen</a>
-					<span class="spinner placeholder"></span>
-				</div>
-			</form>
-		</div>
-		<p style="text-align: center;">Bislang gibt es Daten für die Städte Bochum, Köln und Moers. Die Suche benötigt die Angabe einer Straße und Stadt für sinnvolle Ergebnisse.</p>
-	</div>
-	<div id="map" style="margin-top: 3px;"></div>
-	<div class="content bottom searchform">
-		<div class="header">&hellip; oder suchen Sie nach Themen, die Sie interessieren:</div>
-		<form id="search-form" method="get" action="/suche/" accept-charset="utf-8">
-			<input type="text" id="qinput" name="q" value="" />
-			<a href="#" id="submit" class="awesome extrawide">Suchen</a>
-		</form>
-		<div class="examples" id='search-examples'>
-		</div>
-	</div>
+  <div class="content top">
+    <div id="region-prompt">
+      <div id="region-question" class="question">Ausgewählte Region: <span id="region-current">{{ config['regions'][region_id]['name'] }}</span> <span id="change-region" class="awesome extrawide">Ändern</span></div>
+      <div id="region-choice"></div>
+    </div>
+  </div>
+  <div id="position-form-container" class="content middle">
+    <div id="position-prompt">
+      <form id="position-prompt-form" action="/" method="GET">
+        <div class="question">Sehen Sie sich an, was die Politik in Ihrer Umgebung macht:</div>
+        <div>
+          <span class="mobilerow"><label for="address" id='address-label'>Straße und Stadt:</label> <input id="address" type="text" name='address' title="Straße und Stadt, in der Sie wohnen oder für die Sie sich interessieren"/></span>
+          <a href="#" id='position-prompt-submit' class="awesome extrawide">Anzeigen</a>
+          <span class="spinner placeholder"></span>
+        </div>
+      </form>
+    </div>
+    <p style="text-align: center;">Bislang gibt es Daten für die Städte Bochum, Köln und Moers. Die Suche benötigt die Angabe einer Straße und Stadt für sinnvolle Ergebnisse.</p>
+  </div>
+  <div id="map" style="margin-top: 3px;"></div>
+  <div class="content bottom searchform">
+    <div class="header">&hellip; oder suchen Sie nach Themen, die Sie interessieren:</div>
+    <form id="search-form" method="get" action="/suche/" accept-charset="utf-8">
+      <input type="text" id="qinput" name="q" value="" />
+      <a href="#" id="submit" class="awesome extrawide">Suchen</a>
+    </form>
+    <div class="examples" id='search-examples'>
+    </div>
+  </div>
 </div>
 {% endblock %}

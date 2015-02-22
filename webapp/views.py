@@ -52,6 +52,17 @@ from oparl import oparl_file_accessUrl
 
 @app.route("/")
 def index():
+  # Set region to get value
+  region_id_get = request.args.get('r', False)
+  if region_id_get:
+    session['region_id'] =region_id_get
+  # Set location to get value
+  location_string_get = request.args.get('l', False)
+  if region_id_get and location_string_get:
+    session['address'] = location_string_get.replace("\"", "")
+  # Delete location when location is set + region is not set:
+  if not region_id_get and location_string_get:
+    session['address'] = ''
   return render_template('index.html', session=session)
 
 

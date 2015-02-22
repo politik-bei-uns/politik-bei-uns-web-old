@@ -18,20 +18,12 @@ $(document).ready(function(){
   
   var lastLocationEntry = ''; // die letzte vom User eingegebene Strasse
   
-  map.setView(new L.LatLng(region_data['lat'], region_data['lon']), region_data['zoom']).addLayer(backgroundLayer);
+  map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom).addLayer(backgroundLayer);
   
   if (search_data.address) {
     $('#address').val(search_data.address);
     handleLocationInput();
   }
-  
-  /*
-  Alternative tile config. This tile-set should only be used for testing.
-  // OSM Copyright Notice
-  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: 'Map &copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
-  */
   
   // set to user position, if set and within cologne
   /*OpenRIS.session({}, function(data){
@@ -60,7 +52,28 @@ $(document).ready(function(){
   
   // register post region change actions
   OpenRIS.post_region_change = function() {
-    map.setView(new L.LatLng(region_data['lat'], region_data['lon']), region_data['zoom']).addLayer(backgroundLayer);
+    map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom).addLayer(backgroundLayer);
+    window.history.pushState(String(Date.now()), document.title, "/?r=" + OpenRIS.region.id);
+    
+    // update street description
+    if (OpenRIS.region.type == 1)
+      $('#address-label').text('Straße:');
+    else
+      $('#address-label').text('Straße und Stadt:');
+    // update search examples
+    if ($('#search-examples')) {
+      $('#search-examples').html('');
+      $('#search-examples').append(document.createTextNode('Beispiele: '));
+      $.each(region_data.keyword, function(id, keyword){
+        $('<a/>')
+          .text(keyword)
+          .attr({'href': '/suche/?q=' + encodeURI(keyword)})
+          .appendTo('#search-examples');
+        if (region_data.keyword.length > id + 1)
+          $('#search-examples').append(document.createTextNode(', '));
+      });
+    }
+    changePositionTransform();
   }
   
   
@@ -85,6 +98,7 @@ $(document).ready(function(){
       $('#position-prompt-submit').trigger('click');
     }
   });
+  
   $('#submit').click(function(evt){
     evt.preventDefault();
     $('#search-form').trigger('submit');
@@ -108,7 +122,7 @@ $(document).ready(function(){
     if (address !== '') {
       data = {
         address: address,
-        region: region_data['id']
+        region: OpenRIS.region.id
       };
       $.getJSON('/api/proxy/geocode', data, function(places){
         $('#position-prompt .spinner').css({visibility: 'hidden'});
@@ -242,11 +256,16 @@ $(document).ready(function(){
   
   function resetMap() {
     clearMap();
-    map.setView(new L.LatLng(region_data['lat'], region_data['lon']), region_data['zoom']);
+    map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom);
   }
   
   function handleChangePositionClick(evt) {
     evt.preventDefault();
+    changePositionTransform();
+  }
+  
+  function changePositionTransform() {
+    window.history.pushState(String(Date.now()), document.title, "/?r=" + OpenRIS.region.id);
     $('#map-claim').remove();
     $('#position-prompt').show();
     $('#address').focus();
@@ -279,6 +298,9 @@ $(document).ready(function(){
     if (streetString === '') {
       streetString = sessionData.location_entry;
     }
+    // Set new URL
+    window.history.pushState(String(Date.now()), document.title, "/?r=" + OpenRIS.region.id + '&l=\"' + streetString + '\"');
+    
     var changeLocationLink = $(document.createElement('span')).text(streetString).attr({'id': 'map-claim-street'});
     var newSearchLink = $(document.createElement('a')).text('Neue Suche').attr({'href': '#', 'class': 'awesome extrawide'}).css('margin-left', '20px').click(handleChangePositionClick);
     var article = '';
@@ -312,7 +334,7 @@ $(document).ready(function(){
     markerLayerGroup.addLayer(innerDot);
     var streets = [];
     // Strassen aus der Umgebung abrufen
-    OpenRIS.streetsForPosition(region_data['id'], lat, lon, radius, function(data){
+    OpenRIS.streetsForPosition(OpenRIS.region.id, lat, lon, radius, function(data){
       $.each(data.response, function(street_name, street) {
         if (street.paper_count) {
           $.each(street.nodes, function(nodes_id, nodes){
@@ -322,7 +344,7 @@ $(document).ready(function(){
                 node[1], node[0]
               ));
             });
-            var markerHtml = '<p><b><a href="/suche/?r=' + region_data['id'] + '&q=&quot;' + street_name + '&quot;">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
+            var markerHtml = '<p><b><a href="/suche/?r=' + OpenRIS.region.id + '&q=&quot;' + street_name + '&quot;">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
             if (street.paper_publishedDate && street.paper_name)
               markerHtml += '<br/>Der jüngste Treffer vom ' + OpenRIS.formatIsoDate(street.paper_publishedDate) + ' (' + street.paper_name + ')';
             markerHtml += '</p>';
