@@ -3,6 +3,7 @@
 config.py
 venv/
 temp/*
+.vagrant
 ._*
 *.komodoproject
 *.komodotools
