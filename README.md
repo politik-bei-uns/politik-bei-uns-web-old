@@ -22,6 +22,33 @@ Der **Scraper**, mit dem die Daten aus dem Ratsinformationssystemen der Unterneh
 
 [https://github.com/okfde/ris-scraper/](https://github.com/okfde/ris-scraper/)
 
+###Installation mit Vagrant (z.B. für OSX, Windows)
+
+Mit den folgenden Schritten kannst du ris-web in einer virtuellen Maschine installieren.
+
+0. ris-web und ris-scraper clonen und in das ris-web Verzeichnis wechseln
+```
+	$ git clone https://github.com/okfde/ris-scraper.git
+	$ git clone https://github.com/okfde/ris-web.git
+	$ cd ris-web
+```
+1. [VirtualBox](https://www.virtualbox.org/) installieren
+2. [Vagrant](http://vagrantup.com/) installieren
+3. Vagrant Box runterladen und provisionieren
+
+   ```
+     $ vagrant plugin install vagrant-vbguest
+     $ vagrant up
+   ```
+4. ris-web starten:
+
+   ```
+   	$ vagrant ssh
+   	$ venvs/ris-web/bin/python /vagrant/runserver.py
+   ```
+
+Now you should see ris-web up and running at [http://localhost:23000](http://localhost:23000)
+
 ###Lizenz
 
 Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/okfde/ris-web/blob/master/LIZENZ.txt).
