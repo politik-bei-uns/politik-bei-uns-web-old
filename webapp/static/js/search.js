@@ -2,12 +2,24 @@ $(document).ready(function() {
   OpenRIS.regionLoad();
   
   if (typeof openris_search_settings != undefined) {
+    OpenRIS.search_params = OpenRIS.deepCopy(openris_search_settings);
+    OpenRIS.search_params['output'] = 'facets';
+    runSearch();
+  }
+  
+  function runSearch() {
+    // modify URL
+    url = Array();
+    $.each( OpenRIS.search_params, function( key, value ) {
+      if (value)
+	url.push(key + '=' + String(value).replace(/&#34;/g, "\""));
+    });
+    window.history.pushState(String(Date.now()), document.title, "/suche/?" + url.join('&'));
+    // run search
     $('#search .result').empty();
     $('#search .result').append('<div class="loading big outer"><div class="loading big inner">Suche...</div></div>');
-    var search_parms = OpenRIS.deepCopy(openris_search_settings);
-    search_parms['output'] = 'facets';
     OpenRIS.search(
-      search_parms,
+      OpenRIS.search_params,
       function(data) {
         $('#search .result').empty();
         $('#facets').remove();
@@ -27,20 +39,27 @@ $(document).ready(function() {
       }
     );
   }
-
+  
   $('#search-submit').click(function(evt){
     evt.preventDefault();
-    $('#region_input').val(region_data['id'])
-    $('#searchform').trigger('submit');
+    OpenRIS.search_params['start'] = 0;
+    OpenRIS.search_params['q'] = $('#qinput').val();
+    runSearch();
   });
+  
   $('#searchform').submit(function(evt) {
-    $('#region_input').val(region_data['id'])
-  })
+    evt.preventDefault();
+    OpenRIS.search_params['start'] = 0;
+    OpenRIS.search_params['q'] = $('#qinput').val();
+    runSearch();
+  });
   
   // register post region change actions
   OpenRIS.post_region_change = function() {
-    $('#region_input').val(region_data['id'])
-    $('#searchform').trigger('submit');
+    OpenRIS.search_params['r'] = OpenRIS.region.id;
+    OpenRIS.search_params['start'] = 0;
+    OpenRIS.search_params['q'] = $('#qinput').val();
+    runSearch();
   }
   
   /*
@@ -57,24 +76,24 @@ $(document).ready(function() {
    * @param   String  Either "key" or "value"
    */
   function sortFacet(data, field) {
-		var newlist = [];
-		for (var i in data) {
-			newlist.push({key: i, value: data[i]});
-		}
-		if (field == 'key') {
-			newlist.sort(sortCompareByKey);
-		} else if (field == 'value') {
-			newlist.sort(sortCompareByValue);
-		}
-		return newlist;
-	}
-	function sortCompareByKey(a, b) {
-		return b.key - a.key;
-	}
-	function sortCompareByValue(a, b) {
-		return b.value - a.value;
-	}
-	
+    var newlist = [];
+    for (var i in data)
+      newlist.push({key: i, value: data[i]});
+    if (field == 'key')
+      newlist.sort(sortCompareByKey);
+    else if (field == 'value')
+      newlist.sort(sortCompareByValue);
+    return newlist;
+  }
+  
+  function sortCompareByKey(a, b) {
+	  return b.key - a.key;
+  }
+  
+  function sortCompareByValue(a, b) {
+	  return b.value - a.value;
+  }
+  
   function displaySearchResultFacets(facets, query, targetSelector) {
     if (typeof facets != 'undefined') {
       //create obj of string
@@ -160,7 +179,21 @@ $(document).ready(function() {
       }
       if (!sqs)
         sqs = null
-      list.append('<li class="current"><a title="Diese Einschränkung aufheben" href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="facetdel">&#10005;</span><span class="facetlabel">'+ label.replace(/&#34;/g, "") +'</span></a></li>');
+      // generate list element
+      $('<li>').attr('class', 'current').append(
+	$('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
+	  .attr('title', 'Diese Einschränkung aufheben')
+	  .click({'sqs': sqs}, function(evt) {
+	    evt.preventDefault();
+	    if (evt.data.sqs)
+	      OpenRIS.search_params['fq'] = evt.data.sqs.replace(/\"/g, "&#34;");
+	    else
+	      OpenRIS.search_params['fq'] = null;
+	    runSearch();
+	  })
+	  .append($('<span>').attr('class', 'facetdel').text('✕'))
+	  .append($('<span>').attr('class', 'facetlabel').text(label.replace(/&#34;/g, "").replace(/\"/g, ""))))
+      .appendTo(list);
     }
     else {
       for (var i in facet_data) {
@@ -169,12 +202,24 @@ $(document).ready(function() {
           label = label.replace(/^[0-9]+\s+/, '');
         if (name=='publishedDate')
           label=OpenRIS.monthstr[label.substr(5,7)] + " " + label.substr(0,4);
-        var sqs;
-        if (!openris_search_settings['fq'])
+        if (!OpenRIS.search_params['fq'])
           sqs = name + ':' + quoteFacetValue(facet_data[i].key);
         else
-          sqs = openris_search_settings['fq'] + ';' + name + ':' + quoteFacetValue(facet_data[i].key);
-        list.append('<li><a href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="facetlabel">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
+          sqs = OpenRIS.search_params['fq'] + ';' + name + ':' + quoteFacetValue(facet_data[i].key);
+	// generate list element
+	$('<li>').append(
+	  $('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
+	    .attr('title', 'Auswahl einschränken')
+	    .click({'sqs': sqs}, function(evt) {
+	      evt.preventDefault();
+	      OpenRIS.search_params['fq'] = evt.data.sqs.replace(/\"/g, "&#34;");
+	      runSearch();
+	    })
+	    .append($('<span>').attr('class', 'facetlabel').text(label.replace(/&#34;/g, "").replace(/\"/g, "")))
+	    .append(' ')
+	    .append($('<span>').attr('class', 'num').text(facet_data[i].value)))
+	.appendTo(list);
+        //list.append('<li><a href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="facetlabel">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
       }
     }
     facet.append('<div class="header">'+ headline +'</div>');
@@ -264,12 +309,28 @@ $(document).ready(function() {
     $(targetSelector).append(pager);
     // previous page
     if (start > 0) {
-      pager.append('<a class="awesome extrawide paging back" href="/suche/?'+ searchQueryString({start: (start - openris_search_settings.ppp)}) +'">&larr; &nbsp; Seite zurück</a>');
+      $('<a>').attr('class', 'awesome extrawide paging back')
+	.attr('href', '/suche/?'+ searchQueryString({start: (start - OpenRIS.search_params['ppp'])}))
+	.text('← Seite zurück')
+	.click(function(evt) {
+	  evt.preventDefault();
+	  OpenRIS.search_params['start'] = start - OpenRIS.search_params['ppp'];
+	  runSearch();
+	})
+	.appendTo(pager);
     }
     pager.append(' ');
     // next page
     if (numhits > (start + rows)) {
-      pager.append('<a class="awesome extrawide paging next" href="/suche/?'+ searchQueryString({start: (start + openris_search_settings.ppp)}) +'">Seite weiter &nbsp; &rarr;</a>');
+      $('<a>').attr('class', 'awesome extrawide paging next')
+	.attr('href', '/suche/?'+ searchQueryString({start: (start + OpenRIS.search_params['ppp'])}))
+	.text('Seite weiter →')
+	.click(function(evt) {
+	  evt.preventDefault();
+	  OpenRIS.search_params['start'] = start + OpenRIS.search_params['ppp'];
+	  runSearch();
+	})
+	.appendTo(pager);
     }
   }
   
@@ -285,20 +346,31 @@ $(document).ready(function() {
     widget.attr('class', 'sort');
     $(targetSelector).append(widget);
     widget.append(' &ndash; sortiert nach ');
-    var parts = [];
+    var first = true;
     var sortOptions = {
       'score:desc': 'Relevanz',
       'publishedDate:desc': 'Datum: neuste zuerst',
       'publishedDate:asc': 'Datum: älteste zuerst'
     };
     for (var o in sortOptions) {
+      if (first)
+	first = false;
+      else
+	widget.append(' | ');
       if (data.sort == o) {
-        parts.push('<b>' + sortOptions[o] + '</b>');
+	$('<b>').text(sortOptions[o]).appendTo(widget);
       } else {
-        parts.push('<a href="/suche/?'+ searchQueryString({sort: o, start: 0}) +'">' + sortOptions[o] + '</a>');
+	$('<a>').attr('href', '/suche/?'+ searchQueryString({start: 0, sort: o}))
+	  .text(sortOptions[o])
+	  .click({'o': o}, function(evt) {
+	    evt.preventDefault();
+	    OpenRIS.search_params['start'] = 0;
+	    OpenRIS.search_params['sort'] = evt.data.o;
+	    runSearch();
+	  })
+	.appendTo(widget);
       }
     }
-    widget.append(parts.join(' | '));
   }
   
   /**
@@ -308,7 +380,7 @@ $(document).ready(function() {
    * @param   overwrite
    */
   function searchQueryString(overwrite) {
-    var settings = OpenRIS.deepCopy(openris_search_settings);
+    var settings = OpenRIS.deepCopy(OpenRIS.search_params);
     for (var item in overwrite) {
       if (overwrite[item] == null 
         || typeof overwrite[item] == 'undefined') {

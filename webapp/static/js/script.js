@@ -6,6 +6,7 @@ var OpenRIS = {
   b: (6378137 * 297.257223563) / 298.257223563,
   
   region: {},
+  search_params: {},
   start_method_queue: new Array(),
   
   monthstr: {
@@ -30,6 +31,7 @@ var OpenRIS = {
   streetsForPosition: function(region_id, lat, lon, radius, callback) {
     $.getJSON('/api/streets', {'region': region_id, 'lat': lat, 'lon': lon, 'radius': radius}, callback);
   },
+  
   /**
    * returns a list of position coordinates for a street name,
    * as well as the average coordinates
@@ -41,6 +43,7 @@ var OpenRIS = {
     }
     $.getJSON('/api/locations', {'street': name, 'contain': contain.join(',')}, callback);
   },
+  
   /**
    * Does the same as locationsForStreet, but for a list of names.
    * Requests are queued.
