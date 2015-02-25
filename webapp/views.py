@@ -63,7 +63,13 @@ def index():
   # Delete location when location is set + region is not set:
   if not region_id_get and location_string_get:
     session['address'] = ''
-  return render_template('index.html', session=session)
+  html = render_template('index.html', session=session)
+  response = make_response(html, 200)
+  response.headers['Last-Modified'] = datetime.now()
+  response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+  response.headers['Pragma'] = 'no-cache'
+  response.headers['Expires'] = '-1'
+  return response
 
 
 @app.route("/api/")
@@ -164,8 +170,10 @@ def suche():
   search_settings['date'] = request.args.get('date', '')
   html = render_template('suche.html', search_settings=search_settings)
   response = make_response(html, 200)
-  response.headers['Expires'] = util.expires_date(hours=24)
-  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+  response.headers['Last-Modified'] = datetime.now()
+  response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+  response.headers['Pragma'] = 'no-cache'
+  response.headers['Expires'] = '-1'
   return response
 
 @app.route("/suche/feed/")
