@@ -64,12 +64,12 @@ $(document).ready(function(){
     if ($('#search-examples')) {
       $('#search-examples').html('');
       $('#search-examples').append(document.createTextNode('Beispiele: '));
-      $.each(region_data.keyword, function(id, keyword){
+      $.each(OpenRIS.region.keyword, function(id, keyword){
         $('<a/>')
           .text(keyword)
           .attr({'href': '/suche/?q=' + encodeURI(keyword)})
           .appendTo('#search-examples');
-        if (region_data.keyword.length > id + 1)
+        if (OpenRIS.region.keyword.length > id + 1)
           $('#search-examples').append(document.createTextNode(', '));
       });
     }
