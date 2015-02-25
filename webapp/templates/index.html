@@ -65,7 +65,7 @@ var CONF = {
       <a href="#" id="submit" class="awesome extrawide">Suchen</a>
     </form>
     <div class="examples" id='search-examples'>
-      Beispiele: {% for example in config['regions'][region_id]['keyword'] %}<a href="/suche/q={{ example }}">{{ example }}</a>i {% if not loop.last %}, {% endif %}{% endfor %}
+      Beispiele: {% for example in config['regions'][region_id]['keyword'] %}<a href="/suche/?q={{ example }}">{{ example }}</a> {% if not loop.last %}, {% endif %}{% endfor %}
     </div>
   </div>
 </div>
