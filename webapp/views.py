@@ -65,7 +65,7 @@ def index():
     session['address'] = ''
   html = render_template('index.html', session=session)
   response = make_response(html, 200)
-  response.headers['Last-Modified'] = datetime.now()
+  response.headers['Last-Modified'] = datetime.datetime.now()
   response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
   response.headers['Pragma'] = 'no-cache'
   response.headers['Expires'] = '-1'
@@ -170,7 +170,7 @@ def suche():
   search_settings['date'] = request.args.get('date', '')
   html = render_template('suche.html', search_settings=search_settings)
   response = make_response(html, 200)
-  response.headers['Last-Modified'] = datetime.now()
+  response.headers['Last-Modified'] = datetime.datetime.now()
   response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
   response.headers['Pragma'] = 'no-cache'
   response.headers['Expires'] = '-1'
