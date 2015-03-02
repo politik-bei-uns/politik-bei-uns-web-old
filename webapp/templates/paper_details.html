@@ -79,9 +79,11 @@ var ok_document_url = '{{ paper._id }}';
     <ol>
       {% for consultation in paper.consultation %}
       <li>
+      {% if consultation.agendaItem.meeting %}
       <b>{{ consultation.agendaItem.meeting.name }}</b>,
       {% if consultation.agendaItem.meeting.start %}
       {{ consultation.agendaItem.meeting.start.strftime('%d.%m.%Y') }}.
+      {% endif %}
       {% endif %}
       {% if consultation.agendaItem.name != paper.name %}
       <br/>Thema: {{ consultation.agendaItem.name }}
