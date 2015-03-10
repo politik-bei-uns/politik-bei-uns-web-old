@@ -58,3 +58,5 @@ var openris_search_settings = {
   </div>
 </div>
 {% endblock %}
+
+{% block footericons %}<li><a href="/suche/feed/?r={{ search_settings.r }}&q={{ search_settings.q }}&fq={{ search_settings.fq }}"><img src="/static/img/footer/rss.png" alt="RSS" /></a></li>{% endblock %}

@@ -64,43 +64,53 @@ _gaq.push(['_trackPageview']);
 {% endblock %}
 
 {% block content %}
-<div id="container">
-  <header>
-    <div id="topnav"><a href="/">Startseite</a> | <a href="http://openruhr.de/">Blog</a> | <a href="/impressum/">Impressum</a> | <a href="/datenschutz/">Datenschutz</a></div>
-    <div id="logo"><a href="/"><img src="/static/img/logo/PolitikBeiUns.png" alt="Politik Bei Uns Logo" /></a></div>
-    <div id="nametagline">
-      <div><a id="name" href="/">Offenes Ratsinformationssystem</a></div>
-      <div id="tagline">Transparente Kommunalpolitik für ganz Deutschland</div>
-    </div>
-  </header>
-  <div id="main" role="main">
-    <noscript>
-      <p>Sie müssen JavaScript aktivieren, um diese Site nutzen zu können.</p>
-    </noscript>
-    {% block riscontent %}{% endblock %}
+<header>
+  <div id="topnav"><a href="/">Startseite</a> | <a href="http://openruhr.de/">Blog</a> | <a href="/impressum/">Impressum</a> | <a href="/datenschutz/">Datenschutz</a></div>
+  <div id="logo"><a href="/"><img src="/static/img/logo/PolitikBeiUns.png" alt="Politik Bei Uns Logo" /></a></div>
+  <div id="nametagline">
+    <div><a id="name" href="/">Offenes Ratsinformationssystem</a></div>
+    <div id="tagline">Transparente Kommunalpolitik für ganz Deutschland</div>
   </div>
-  <footer>
-    <div id="footer">
-      <ul class="column">
-        <li><a href="/">Startseite</a></li>
-      </ul>
-      <ul class="column">
-          <li><a href="/hilfe/">Hilfe</a></li>
-      </ul>
-      <ul class="column">
-          <li><a href="/ueber/">Über uns</a></li>
-      </ul>
-      <ul class="column">
-          <li><a href="/daten/">Daten</a></li>
-      </ul>
-      <ul class="column">
-          <li><a href="/api/">API</a></li>
-      </ul>
-      <ul class="column">
-        <li><a href="/disclaimer/" class="warn">Datenqualität/Haftungsausschluss</a></li>
-      </ul>
-    </div>
-  </footer>
+</header>
+<div id="main" role="main">
+  <noscript>
+    <p>Sie müssen JavaScript aktivieren, um diese Site nutzen zu können.</p>
+  </noscript>
+  {% block riscontent %}{% endblock %}
 </div>
+<footer>
+  <ul id="footer-icons">
+    <li><a href="https://twitter.com/politikbeiuns"><img src="/static/img/footer/twitter.png" alt="Twitter" /></a></li>
+    <li><a href="https://www.facebook.com/OKFNetwork"><img src="/static/img/footer/facebook.png" alt="Facebook" /></a></li>
+    <li><a href="mailto:info@politik-bei-uns.de"><img src="/static/img/footer/mail.png" alt="E-Mail" /></a></li>
+    {% block footericons %}{% endblock %}
+  </ul>
+  <ul id="footer-menu">
+    <li class="large">
+      <h4>Ziel der Seite</h4>
+      <p>"Politik Bei Uns" stellt politische Entscheidungen aus dem Stadtrat und seinen Ausschüssen überregional und leicht durchsuchbar dar.</p>
+    </li>
+    <li>
+      <h4>Informationen</h4>
+      <ul>
+        <li><a href="/hilfe/">Hilfe</a></li>
+        <li><a href="/ueber/">Über uns</a></li>
+        <li><a href="/disclaimer/">Haftungsausschluss</a></li>
+      </ul>
+    </li>
+    <li>
+      <h4>Für Entwickler</h4>
+      <ul>
+        <li><a href="/daten/">Daten</a></li>
+        <li><a href="/api/">API</a></li>
+        <li><a href="https://github.com/okfde/">Github</a></li>
+      </ul>
+    </li>
+    <li class="large">
+      <h4>Ein Projekt der</h4>
+      <a href="http://okfn.de/"><img src="/static/img/footer/okf-de.png" alt="Open Knowdledge Foundation" /></a>
+    </li>
+  </ul>
+</footer>
 {% endblock %}
 

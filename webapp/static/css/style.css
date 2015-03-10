@@ -60,34 +60,12 @@ input:invalid, textarea:invalid { background-color: #f0dddd; }
 table { border-collapse: collapse; border-spacing: 0; }
 td { vertical-align: top; }
 
-
-/* ==|== primary styles =====================================================
-   Author: Marian Steinbach
-   ========================================================================== */
-
-
-
-
 /* Das sind die Einstellungen für kleine Bildschirme (Smartphones).
  * Viel hiervon wird durch die @media queries ueberschrieben
  */
-body {
-	margin: 8px;
-}
 
-#maintenance {
-	background-color: #ede4b6;
-	margin-top: 20px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	border-radius: 3px;
-	color: #333;
-	font-size: 90%;
-	padding: 5px;
-	margin-bottom: 15px;
-}
 header {
-	padding: 0.3em 0.7em 1.8em 0;
+	padding: 1em 0.7em 1.8em 0;
 	min-height: 68px;
 	margin-left: 16px;
 	overflow: auto;
@@ -122,11 +100,12 @@ header {
 	text-decoration: underline;
 }
 footer {
-	margin: 10px 16px 50px 16px;
 	padding: 1em 0em;
+	background-color: #ebf4e3;
 	font-size: 90%;
 	overflow: auto;
 }
+
 footer a, footer a:link, footer a:visited {
 	color: #777777;
 	text-decoration: none;
@@ -140,7 +119,7 @@ footer a:hover {
 	cursor: pointer;
 }
 footer .column {
-	width: 120px;
+	width: 200px;
 	float: left;
 	list-style-type: none;
 	margin: 0;
@@ -148,12 +127,6 @@ footer .column {
 }
 
 #main {
-	/*
-	background-color: #ebf4e3;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px;
-	*/
 	margin: 0;
 }
 
@@ -185,19 +158,11 @@ footer .column {
 	margin-bottom: 3px;
 }
 .content.bottom {
-	-webkit-border-bottom-left-radius: 10px;
-	-webkit-border-bottom-right-radius: 10px;
-	-moz-border-radius-bottomleft: 10px;
-	-moz-border-radius-bottomright: 10px;
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
-	-webkit-border-top-left-radius: 0%;
-	-webkit-border-top-right-radius: 0;
-	-moz-border-radius-topleft: 0;
-	-moz-border-radius-topright: 0;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
 	margin-top: 3px;
+	margin-bottom: 0;
 }
 .content.middle {
 	-webkit-border-radius: 0;
@@ -211,7 +176,7 @@ footer .column {
 }
 
 noscript {
-    background-color: yellow;
+  background-color: yellow;
 }
 
 h1 {
@@ -304,6 +269,55 @@ span.spinner {
 .datatable td, .datatable th {
 	border: 1px solid #000000;
 }
+
+#footer-icons {
+	text-align: center;
+	background-image: url('/static/img/footer/line.png');
+	background-position: 0 30px;
+	background-repeat: repeat-x;
+	padding: 0;
+}
+
+#footer-icons li {
+	display: inline;
+	margin: 0 0.2rem;
+	list-style: none;
+}
+
+#footer-menu {
+	text-align: center;
+}
+
+#footer-menu li {
+	text-align: left;
+	display: inline-block;
+	width: 11rem;
+	list-style: none;
+	padding: 0 1rem;
+	vertical-align: top;
+}
+
+#footer-menu h4 {
+	color: #6c9447;
+}
+
+#footer-menu p {
+	color: #777777;
+}
+
+#footer-menu .large {
+	width: 15rem;
+}
+
+#footer-menu ul {
+	padding: 0;
+}
+
+#footer-menu ul li {
+	padding: 0 0 0.3rem 0;
+	
+}
+
 
 /*********** page-specific styles *********/
 
@@ -521,7 +535,6 @@ a:hover .facetdel {
 }
 #home .searchform {
 	text-align: center;
-	margin-bottom: 1em;
 }
 #home .header {
 	margin-bottom: 1em;
@@ -624,43 +637,6 @@ code {
 .hidden_debug {
 	display: none;
 }
-
-/* Buttons */
-
-/*
-.pager a, .btn {
-	display: inline-block;
-	color: #fff;
-	background-repeat: repeat-x;
-	background-image: -khtml-gradient(linear, left top, left bottom, from(#c2dcb4), to(#7aa265));
-	background-image: -moz-linear-gradient(top, #c2dcb4, #7aa265);
-	background-image: -ms-linear-gradient(top, #c2dcb4, #7aa265);
-	background-image: -webkit-linear-gradient(top, #c2dcb4, #7aa265);
-	background-image: -o-linear-gradient(top, #c2dcb4, #7aa265);
-	background-image: linear-gradient(top, #c2dcb4, #7aa265);
-	border-top-width: 1px;
-	border-right-width: 1px;
-	border-bottom-width: 1px;
-	border-left-width: 1px;
-	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-	padding: 0.7em 2em;
-	font-size: 13px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-	text-decoration: none;
-	margin: none 6px;
-}
-.pager a:hover, .btn:hover {
-	background-image: -khtml-gradient(linear, left top, left bottom, from(#cae1be), to(#6d905a));
-	background-image: -moz-linear-gradient(top, #cae1be, #6d905a);
-	background-image: -ms-linear-gradient(top, #cae1be, #6d905a);
-	background-image: -webkit-linear-gradient(top, #cae1be, #6d905a);
-	background-image: -o-linear-gradient(top, #cae1be, #6d905a);
-	background-image: linear-gradient(top, #cae1be, #6d905a);
-	border-color: rgba(255, 255, 255, 0.6) rgba(0, 0, 0, 0.6) rgba(0, 0, 0, 0.6) rgba(255, 255, 255, 0.6);
-}
-*/
 
 .awesome, .awesome:visited, .awesome:link {
 	background: #7fa75a url(/static/img/gradient.png) repeat-x; 
@@ -789,7 +765,7 @@ form .awesome {
 
 @media only screen and (min-width: 480px) {
   /* Gilt auch fuer iPad im vertikalen Modus */
-  body { margin: 5px 20px; font-size: 14px;}
+  header, #main, footer { margin: 0 20px; font-size: 14px;}
   header { min-height: 92px; }
   #logo { width: 200px; }
   #name { font-size: 200%; }
@@ -799,29 +775,24 @@ form .awesome {
   label {display: inline;}
   #home #address { width: 18em; }
   #home #qinput { width: 18em; }
-  /*#home #submit { padding-left: 1em; padding-right: 1em;}*/
-  /* input, select, textarea { width: 24em; } */
+	#footer-icons li { margin: 0 1rem; }
 }
 
 @media only screen and (min-width: 800px) {
-  body { margin: 5px 50px; font-size: 14px; }
+  header, #main, footer { margin: 0 50px; font-size: 14px; }
   #home #address { width: 22em; }
   #home #qinput { width: 22em; }
-  /*#home #submit { padding-left: 2em; padding-right: 2em;}*/
   .mobilerow { display: inline;  margin-top: 0; margin-bottom: 0; margin-left: 10px; margin-right: 10px;}
-  /*input, select, textarea { width: 30em; } */
+	#footer-icons li { margin: 0 2rem; }
 }
 @media only screen and (min-width: 1000px) {
-  /*html { font-size: 110%; }*/
-  body { margin: 5px 100px; font-size: 14px; }
+  header, #main, footer { margin: 0 100px; font-size: 14px; }
 }
 @media only screen and (min-width: 1200px) {
-  /*html { font-size: 120%; }*/
-  body { margin: 10px 150px; }
+  header, #main, footer { margin: 0 150px; }
 }
 @media only screen and (min-width: 1400px) {
-  /*html { font-size: 130%; }*/
-  body { margin: 20px 200px; }
+  header, #main, footer { margin: 0 200px; }
 }
 
 
@@ -1217,12 +1188,6 @@ body .leaflet-control-zoom-out {
 
 /* End leaflet */
 
-
-#footer {
-    overflow: auto;
-}
-
-
 /* ==|== non-semantic helper classes ======================================== */
 .ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; }
 .ir br { display: none; }
@@ -1233,18 +1198,6 @@ body .leaflet-control-zoom-out {
 .clearfix:before, .clearfix:after { content: ""; display: table; }
 .clearfix:after { clear: both; }
 .clearfix { zoom: 1; }
-
-
-/* ==|== media queries ====================================================== */
-
-@media only screen and (min-width: 480px) {
-
-
-}
-
-@media only screen and (min-width: 768px) {
-
-}
 
 
 
