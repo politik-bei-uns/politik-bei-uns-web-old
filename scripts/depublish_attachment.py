@@ -71,8 +71,8 @@ def depublish(config, fs, file_id, code, message):
     sys.stderr.write("No file found with _id='%s'\n" %
       file_id)
     return
-  modify_file(fs, aid, code, message)
-  remove_thumbnails(config, file_id)
+  body_id = modify_file(fs, aid, code, message)
+  remove_thumbnails(config, body_id, file_id)
 
 
 def file_exists(file_id):
@@ -93,7 +93,8 @@ def modify_file(fs, file_id, code, message):
   """
   doc = db.file.find_one(file_id)
   # Delete file from gridfs
-  fs.delete(doc['file'].id)
+  if 'file' in doc:
+    fs.delete(doc['file'].id)
   # Modify file document
   db.file.update(
     {'_id': file_id},
@@ -111,14 +112,14 @@ def modify_file(fs, file_id, code, message):
         'file': 1
       }
     })
+  return str(doc['body'].id)
 
 
-def remove_thumbnails(config, file_id):
+def remove_thumbnails(config, body_id, file_id):
   """
   Deletes the thumbnail folder for this file
   """
-  path = (config['thumbs_path'] + os.sep +
-    subfolders_for_file(file_id))
+  path = (config['thumbs_path'] + os.sep + body_id + os.sep + subfolders_for_file(file_id))
   shutil.rmtree(path)
 
 
