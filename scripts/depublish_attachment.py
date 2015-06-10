@@ -37,119 +37,130 @@ entstanden.
 import sys
 sys.path.append('./')
 
-import config
+import config as sysconfig
 import os
 from pymongo import MongoClient
+import gridfs
 import bson
 import gridfs
 import datetime
 import shutil
-from generate_thumbs import subfolders_for_attachment
+from generate_thumbs import subfolders_for_file
 
 
 ALLOWED_CODES = [
-    'COPYRIGHT',
-    'COPYRIGHT_RISK',
-    'NONPUBLIC_DOCUMENT',
-    'PRIVACY'
+  'COPYRIGHT',
+  'COPYRIGHT_RISK',
+  'NONPUBLIC_DOCUMENT',
+  'PRIVACY'
 ]
 
-
-def depublish(attachment_id, code, message):
-    aid = bson.ObjectId(attachment_id)
-    if not attachment_exists(aid):
-        sys.stderr.write("No attachement found with _id='%s'\n" %
-            attachment_id)
-        return
-    modify_attachment(aid, code, message)
-    remove_thumbnails(attachment_id)
-
-
-def attachment_exists(attachment_id):
-    """
-    Return True if attachment exists, False otherwise
-    """
-    find = db.attachments.find_one(attachment_id)
-    if find is not None:
-        return True
-    return False
+def get_config(db):
+  """
+  Returns Config JSON
+  """
+  config = db.config.find_one()
+  if '_id' in config:
+    del config['_id']
+  return config
 
 
-def modify_attachment(attachment_id, code, message):
-    """
-    Write depublish info,
-    remove fulltext and thumbnails,
-    remove file from GridFS
-    """
-    doc = db.attachments.find_one(attachment_id, {'file': 1})
-    # Delete file from gridfs
-    fs.delete(doc['file'].id)
-    # Modify attachment document
-    db.attachments.update(
-        {'_id': attachment_id},
-        {
-            '$set': {
-                'depublication': {
-                    'date': datetime.datetime.utcnow(),
-                    'code': code,
-                    'comment': message
-                }
-            },
-            '$unset': {
-                'fulltext': 1,
-                'thumbnails': 1,
-                'file': 1
-            }
-        })
+def depublish(config, fs, file_id, code, message):
+  aid = bson.ObjectId(file_id)
+  if not file_exists(aid):
+    sys.stderr.write("No file found with _id='%s'\n" %
+      file_id)
+    return
+  modify_file(fs, aid, code, message)
+  remove_thumbnails(config, file_id)
 
 
-def remove_thumbnails(attachment_id):
-    """
-    Deletes the thumbnail folder for this attachment
-    """
-    path = (config.THUMBS_PATH + os.sep +
-        subfolders_for_attachment(attachment_id))
-    shutil.rmtree(path)
+def file_exists(file_id):
+  """
+  Return True if file exists, False otherwise
+  """
+  find = db.file.find_one(file_id)
+  if find is not None:
+    return True
+  return False
+
+
+def modify_file(fs, file_id, code, message):
+  """
+  Write depublish info,
+  remove fulltext and thumbnails,
+  remove file from GridFS
+  """
+  doc = db.file.find_one(file_id)
+  # Delete file from gridfs
+  fs.delete(doc['file'].id)
+  # Modify file document
+  db.file.update(
+    {'_id': file_id},
+    {
+      '$set': {
+        'depublication': {
+          'date': datetime.datetime.utcnow(),
+          'code': code,
+          'comment': message
+        }
+      },
+      '$unset': {
+        'fulltext': 1,
+        'thumbnails': 1,
+        'file': 1
+      }
+    })
+
+
+def remove_thumbnails(config, file_id):
+  """
+  Deletes the thumbnail folder for this file
+  """
+  path = (config['thumbs_path'] + os.sep +
+    subfolders_for_file(file_id))
+  shutil.rmtree(path)
 
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='Depublish an attachment')
-    parser.add_argument('-id', '--attachmentid', dest='id', metavar='ID',
-        type=str,
-        help='ID of the attachment entry, e.g. 515f2d34c9791e3320c0eea2')
-    parser.add_argument('-c', '--code', dest='code', metavar='CODE', type=str,
-        help='One of COPYRIGHT, COPYRIGHT_RISK, NONPUBLIC_DOCUMENT, PRIVACY')
-    parser.add_argument('-m', '--message', dest='message',
-        type=str, metavar='MESSAGE', help='Additional explanation')
+  import argparse
+  parser = argparse.ArgumentParser(description='Depublish an file')
+  parser.add_argument('-id', '--fileid', dest='id', metavar='ID',
+    type=str,
+    help='ID of the file entry, e.g. 515f2d34c9791e3320c0eea2')
+  parser.add_argument('-c', '--code', dest='code', metavar='CODE', type=str,
+    help='One of COPYRIGHT, COPYRIGHT_RISK, NONPUBLIC_DOCUMENT, PRIVACY')
+  parser.add_argument('-m', '--message', dest='message',
+    type=str, metavar='MESSAGE', help='Additional explanation')
 
-    args = parser.parse_args()
+  args = parser.parse_args()
 
-    error = False
+  error = False
 
-    if args.id is None:
-        sys.stderr.write("No attachment ID given.\n")
-        error = True
+  if args.id is None:
+    sys.stderr.write("No file ID given.\n")
+    error = True
 
-    if args.code is None:
-        sys.stderr.write("No reason CODE given.\n")
-        error = True
-    else:
-        if args.code not in ALLOWED_CODES:
-            sys.stderr.write("Given CODE is invalid.\n")
-            error = True
+  if args.code is None:
+    sys.stderr.write("No reason CODE given.\n")
+    error = True
+  else:
+    if args.code not in ALLOWED_CODES:
+      sys.stderr.write("Given CODE is invalid.\n")
+      error = True
 
-    if args.message is None:
-        sys.stderr.write("No MESSAGE given.\n")
-        error = True
+  if args.message is None:
+    sys.stderr.write("No MESSAGE given.\n")
+    error = True
 
-    if error:
-        sys.stderr.write("\n")
-        parser.print_help()
-        sys.exit(1)
+  if error:
+    sys.stderr.write("\n")
+    parser.print_help()
+    sys.exit(1)
 
-    connection = MongoClient(config.DB_HOST, config.DB_PORT)
-    db = connection[config.DB_NAME]
-    fs = gridfs.GridFS(db)
-
-    depublish(args.id, args.code, args.message)
+  connection = MongoClient(sysconfig.MONGO_HOST, sysconfig.MONGO_PORT)
+  db = connection[sysconfig.MONGO_DBNAME]
+  fs = gridfs.GridFS(db)
+  config = get_config(db)
+  
+  depublish(config, fs, args.id, args.code, args.message)
