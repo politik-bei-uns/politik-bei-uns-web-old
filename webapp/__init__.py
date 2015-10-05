@@ -4,6 +4,7 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.basicauth import BasicAuth
 from flask.ext.cache import Cache
 from flask.ext.mongo_sessions import MongoDBSessionInterface
+from flask.ext.elasticsearch import FlaskElasticsearch
 
 
 app = Flask(__name__)
@@ -20,14 +21,16 @@ bootstrap = Bootstrap(app)
 # SimpleAuth
 basic_auth = BasicAuth(app)
 
+# Database + Search Server
 mongo = PyMongo(app)
+es = FlaskElasticsearch(app)
 
 # Sessions and Configuration
 import db
 with app.app_context():
   app.session_interface = MongoDBSessionInterface(app, mongo.db, 'flasksessions')
   app.config.update(db.get_config())
-  
+
 import webapp.views
 import webapp.api
 import webapp.oparl

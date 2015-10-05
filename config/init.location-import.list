@@ -1,0 +1,9 @@
+OSM Relations: http://wiki.openstreetmap.org/wiki/WikiProject_Germany/Grenzen/Nordrhein-Westfalen
+
+CITY=bochum CITYID=54626a479bcda406fb531236 REGBEZ=arnsberg-regbez FOLDER=nordrhein-westfalen OSM_RELATION=62644
+CITY=bottrop REGBEZ=muenster OSM_RELATION=62634
+CITY=duisburg REGBEZ=duesseldorf OSM_RELATION=62456
+CITY=koeln CITYID=549404fa9bcda405c6f78ecc REGBEZ=koeln-regbez FOLDER=nordrhein-westfalen OSM_RELATION=62578
+CITY=moers CITYID=547f8f369bcda406edffe62c REGBEZ=duesseldorf-regbez FOLDER=nordrhein-westfalen OSM_RELATION=58623
+CITY=schwelm REGBEZ=arnsberg OSM_RELATION=162833
+CITY=witten REGBEZ=arnsberg OSM_RELATION=162826

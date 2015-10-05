@@ -181,19 +181,19 @@ $(document).ready(function() {
         sqs = null
       // generate list element
       $('<li>').attr('class', 'current').append(
-	$('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
-	  .attr('title', 'Diese Einschränkung aufheben')
-	  .click({'sqs': sqs}, function(evt) {
-	    evt.preventDefault();
-	    if (evt.data.sqs)
-	      OpenRIS.search_params['fq'] = evt.data.sqs.replace(/\"/g, "&#34;");
-	    else
-	      OpenRIS.search_params['fq'] = null;
-	    runSearch();
-	  })
-	  .append($('<span>').attr('class', 'facetdel').text('✕'))
-	  .append($('<span>').attr('class', 'facetlabel').text(label.replace(/&#34;/g, "").replace(/\"/g, ""))))
-      .appendTo(list);
+			$('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
+				.attr('title', 'Diese Einschränkung aufheben')
+				.click({'sqs': sqs}, function(evt) {
+					evt.preventDefault();
+					if (evt.data.sqs)
+						OpenRIS.search_params['fq'] = evt.data.sqs.replace(/\"/g, "&#34;");
+					else
+						OpenRIS.search_params['fq'] = null;
+					runSearch();
+				})
+				.append($('<span>').attr('class', 'facetdel').text('✕'))
+				.append($('<span>').attr('class', 'facetlabel').text(label.replace(/&#34;/g, "").replace(/\"/g, ""))))
+				.appendTo(list);
     }
     else {
       for (var i in facet_data) {
@@ -206,19 +206,22 @@ $(document).ready(function() {
           sqs = name + ':' + quoteFacetValue(facet_data[i].key);
         else
           sqs = OpenRIS.search_params['fq'] + ';' + name + ':' + quoteFacetValue(facet_data[i].key);
-	// generate list element
-	$('<li>').append(
-	  $('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
-	    .attr('title', 'Auswahl einschränken')
-	    .click({'sqs': sqs}, function(evt) {
-	      evt.preventDefault();
-	      OpenRIS.search_params['fq'] = evt.data.sqs.replace(/\"/g, "&#34;");
-	      runSearch();
-	    })
-	    .append($('<span>').attr('class', 'facetlabel').text(label.replace(/&#34;/g, "").replace(/\"/g, "")))
-	    .append(' ')
-	    .append($('<span>').attr('class', 'num').text(facet_data[i].value)))
-	.appendTo(list);
+				// generate list element
+				list_element = $('<li>').append(
+					$('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
+						.attr('title', 'Auswahl einschränken')
+						.click({'sqs': sqs}, function(evt) {
+							evt.preventDefault();
+							OpenRIS.search_params['fq'] = evt.data.sqs.replace(/\"/g, "&#34;");
+							runSearch();
+						})
+						.append($('<span>').attr('class', 'facetlabel').text(label.replace(/&#34;/g, "").replace(/\"/g, "")))
+						.append(' ')
+						.append($('<span>').attr('class', 'num').text(facet_data[i].value)))
+				if (name=='publishedDate')
+					list_element.prependTo(list);
+				else
+					list_element.appendTo(list);
         //list.append('<li><a href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="facetlabel">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
       }
     }

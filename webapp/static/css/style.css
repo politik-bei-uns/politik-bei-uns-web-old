@@ -318,6 +318,37 @@ span.spinner {
 	
 }
 
+#address-box, #qinput-box {
+	position: relative;
+	display: inline;
+}
+
+#address-live, #qinput-live {
+	display: none;
+	position: absolute;
+	left: 0;
+	margin: 0;
+	background-color: #FFFFFF;
+	border: 1px solid #000000;
+	text-align: left;
+	z-index: 3000;
+}
+
+
+#address-live ul, #qinput-live ul {
+	margin: 5px 0;
+	padding: 0;
+	list-style: none;
+}
+
+#address-live li, #qinput-live li {
+	padding: 2px 10px;
+	cursor: pointer;
+}
+
+#address-live li.highlighted, #address-live li:hover, #qinput-live li.highlighted, #qinput-live li:hover {
+	background-color: #FE57A1;
+}
 
 /*********** page-specific styles *********/
 
@@ -327,10 +358,13 @@ span.spinner {
 	margin: 0 0 5px 0;
 }
 #docdetails .metadata td.label {
-	padding: 3px 14px 3px 0px;
+	padding: 4px 14px 3px 0px;
 	line-height: 140%;
 	color: #666;
 	font-size: 100%;
+	border-radius: 0;
+	display: table-cell;
+	text-align: left;
 }
 #docdetails .metadata td.value {
 	padding: 3px 3px 3px 0px;
@@ -401,6 +435,7 @@ span.spinner {
 	font-weight: normal;
 	margin: 0;
 }
+
 li.resultitem {
 	margin: 0 0 1em 0;
 }
@@ -572,7 +607,7 @@ a:hover .facetdel {
 	padding: 5px;
 }
 #region-choice span {
-	margin: 0px 5px;
+	margin: 0 5px 5px 5px;
 }
 #location-prompt-resultchoice {
 	line-height: 160%;

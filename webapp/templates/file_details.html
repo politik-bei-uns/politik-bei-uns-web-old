@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block title %}{{ file.name }} | {{ config.site_name }}{% endblock %}
+{% block ogtitle %}{{ file.name }} {{ config.site_name }}{% endblock %}
+{% block meta_description %}Details einer Datei{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('static', filename='js/file_details.js') }}"></script>
+{% endblock %}
+
+{% block riscontent %}
+{% if file.thumbnails %}
+{% set twidth = (file.thumbnails['300']|sum(attribute='width') + (11 * file.thumbnails['300']|length)) %}
+{% set numpages = file.thumbnails['300']|length %}
+{% endif %}
+<div id="docdetails">
+  <div class="content top">
+    <h1>Datei: {{ file.name }}</h1>
+		<table class="metadata">
+			<tbody>
+				{% if file.fileName %}
+				<tr>
+					<td class="label">Dateiname:</td>
+					<td class="value">{{ file.fileName }}</td>
+				</tr>
+				{% endif %}
+				<tr>
+					<td class="label">Dateigröße:</td>
+					<td class="value">{{ (file.size / 1024)|round(0)|int }} KB</td>
+				</tr>
+				{% if numpages %}
+				<tr>
+					<td class="label">Seitenzahl:</td>
+					<td class="value">{{ numpages }} Seiten</td>
+				</tr>
+				{% endif %}
+				<tr>
+					<td class="label">Quelle:</td>
+					<td class="value">{% if file.originalDownloadPossible %}<a href="{{ file.originalUrl }}">{% endif %}{{ file.originalUrl }}{% if file.originalDownloadPossible %}</a>{% else %} (Direkter Download durch technische Beschränkungen der Quelle nicht möglich.){% endif %}</td>
+				</tr>
+				{% if file.usage %}
+				<tr>
+					<td class="label">Verwendung:</td>
+					<td class="value">
+						{% for use in file.usage %}
+						{% if use.type == 'meeting' %}
+						In der Sitzung {{ use.data.name }} als {{ 'Einladung' if use.function == 'invitation' else 'Ergebnisprotokoll' if use.function == 'resultsProtocol' else 'Wortprotokoll' if use.function == 'verbatimProtocol' else 'weitere Anlage' }}
+						{% elif use.type == 'agendaItem' %}
+						Auf dem Tagesordnungspunkt {{ use.data.name }} als {{ 'Beschluss' if use.function == 'resolutionFile' else 'weitere Anlage' }}
+						{% else %}
+						In der Vorlage <a href="/paper/{{ use.data._id }}">{{ use.data.name }}</a> als {{ 'primäre Anlage' if use.function == 'mainFile' else 'weitere Anlage' }}
+						{% endif %}
+						{% if not loop.last %}, {% endif %}
+						{% endfor %}
+					</td>
+				</tr>
+				{% endif %}
+			</tbody>
+		</table>
+		
+    {% if file.file %}
+    <div class="actions" style="margin-top: 15px;">
+			<a target="_blank" href="/file/{{ file._id }}/download" class="awesome">Datei downloaden</a>
+    </div>
+    {% endif %}
+  </div>
+  <div class="attachment content middle" id="filepreview-{{ file._id }}">
+    <h2>Vorschau der Datei</h2>
+    {% if file.depublication %}
+    <div class="attachmentexclusion">
+      <p class="exclusionheader">Es tut uns leid, aber dieses Dokument wurde am {{ file.depublication.date.strftime('%d.%m.%Y') }} enfernt. Die Begründung:</p>
+      <p class="reasontext">
+        {{ file.depublication.comment }}
+      </p>
+    </div>
+    {% else %}
+    {% if file.thumbnails %}
+    <div class="thumbs">
+      <div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
+        {% for thumbnail in file.thumbnails['300'] %}
+        <img class="thumb" src="{{ generate_file_thumbnail_url(file.body._id, file._id, 300, loop.index) }}" alt="Vorschau zu {{ file.name }} zum Thema {{ file.name }}"{% if file.thumbnails['800'][loop.index - 1] %} onload="$(this).data('width800', {{ file.thumbnails['800'][loop.index - 1]['width'] }} );" {% endif %}/>
+        {% endfor %}
+      </div>
+    </div>
+		{% else %}
+		<div class="nothumbs"><div class="smallnote">Zu diesem Anhang liegen keine Vorschaubilder vor.</div></div>
+	{% endif %}
+	</div>
+  <div class="attachment content middle" id="filetext-{{ file._id }}">
+		<h2>Inhalt der Datei</h2>
+		{% if file.fulltext %}
+		<div class="fulltext">
+			<div class="complete">
+				<div class="text">{{ file.fulltext|trim }}</div>
+			</div>
+		</div>
+		{% else %}
+		<div class="nofulltext">
+			<div class="smallnote">Zu diesem Anhang kann leider kein Text angezeigt und durchsucht werden. Evtl. handelt es sich um den Scan einer Papiervorlage.</div>
+		</div>
+    {% endif %}
+  {% endif%}
+  </div>
+  </div>
+</div>
+{% endblock %}

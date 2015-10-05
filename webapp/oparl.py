@@ -54,51 +54,39 @@ from webapp import app
 @app.route('/oparl')
 def oparl_general():
   return oparl_basic(lambda params: {
-    "@id": "de.politik-bei-uns",
-    "@type": "OParlSystem",
+    "id": "de.politik-bei-uns",
+    "type": "http://oparl.org/schema/1.0/System",
+    "oparlVersion": "http://oparl.org/specs/1.0/",
+    "name": "OKF-DE OParl Service",
     "body": "%s/oparl/body%s" % (app.config['api_url'], generate_postfix(params)),
     "contactEmail": "ernesto.ruge@okfn.de",
     "contactName": "Ernesto Ruge, Open Knowledge Foundation Deutschland e.V.",
-    "name": "OKF-DE Oparl Service",
-    "oparlVersion": "http://oparl.org/spezifikation/1.0/",
-    "newObjects": "%s/feeds/new" % app.config['api_url'],
+    "websire": "http://politik-bei-uns.de/",
     "product": "http://politik-bei-uns.de/",
-    "removedObjects": "%s/feeds/removed" % app.config['api_url'],
-    "updatedObjects": "%s/feeds/updated" % app.config['api_url'],
     "vendor": "http://politik-bei-uns.de/"
   })
-
-@app.route('/oparl/feeds/new')
-def oparl_feed_new():
-  return oparl_basic(oparl_feed_new_data)
-
-def oparl_feed_new_data(params):
-  ret = {
-    'items': [],
-    'itemsPerPage': 100,
-    'nextPage': "%s/feeds/new?p=%s" % (app.config['api_url'], params['page'] + 1)
-  }
-  if params['page'] > 1:
-    ret['fistPage'] = "%s/feeds/new" % (app.config['api_url'])
-  if params['page'] == 2:
-    ret['prevPage'] = "%s/feeds/new" % (app.config['api_url'])
-  if params['page'] > 2:
-    ret['prevPage'] = "%s/feeds/new?p=%s" % (app.config['api_url'], params['page'] - 1)
-  result = db.get_all_new()
-  
-  return result
-
-@app.route('/oparl/feeds/removed')
-def oparl_feed_removed():
-  pass
-
-@app.route('/oparl/feeds/updated')
-def oparl_feed_updated():
-  pass
 
 ####################################################
 # body
 ####################################################
+
+# process data
+def oparl_body_process_dataset(data, params):
+  data['legislativeTerm'] = generate_sublist_url(params=params, main_type='body', sublist_type='legislativeTerm')
+  data['organization'] = generate_sublist_url(params=params, main_type='body', sublist_type='organization')
+  data['membership'] = generate_sublist_url(params=params, main_type='body', sublist_type='membership')
+  data['person'] = generate_sublist_url(params=params, main_type='body', sublist_type='person')
+  data['meeting'] = generate_sublist_url(params=params, main_type='body', sublist_type='meeting')
+  data['agendaItem'] = generate_sublist_url(params=params, main_type='body', sublist_type='agendaItem')
+  data['paper'] = generate_sublist_url(params=params, main_type='body', sublist_type='paper')
+  data['consultation'] = generate_sublist_url(params=params, main_type='body', sublist_type='consultation')
+  data['file'] = generate_sublist_url(params=params, main_type='body', sublist_type='file')
+  data['system'] = "%s/oparl%s" % (app.config['api_url'], generate_postfix(params))
+  data['type'] = 'http://oparl.org/schema/1.0/Body'
+  data['id'] = generate_single_url(type='body', id=data['_id'], params=params)
+  del data['config']
+  del data['_id']
+  return data
 
 # body list
 @app.route('/oparl/body')
@@ -118,20 +106,7 @@ def oparl_body(body_id):
 def oparl_body_data(params):
   data = db.get_body(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['legislativeTerm'] = generate_sublist_url(params=params, main_type='body', sublist_type='legislativeTerm')
-    data[0]['organization'] = generate_sublist_url(params=params, main_type='body', sublist_type='organization')
-    data[0]['membership'] = generate_sublist_url(params=params, main_type='body', sublist_type='membership')
-    data[0]['person'] = generate_sublist_url(params=params, main_type='body', sublist_type='person')
-    data[0]['meeting'] = generate_sublist_url(params=params, main_type='body', sublist_type='meeting')
-    data[0]['agendaItem'] = generate_sublist_url(params=params, main_type='body', sublist_type='agendaItem')
-    data[0]['paper'] = generate_sublist_url(params=params, main_type='body', sublist_type='paper')
-    data[0]['consultation'] = generate_sublist_url(params=params, main_type='body', sublist_type='consultation')
-    data[0]['file'] = generate_sublist_url(params=params, main_type='body', sublist_type='file')
-    data[0]['system'] = "%s/oparl%s" % (app.config['api_url'], generate_postfix(params))
-    data[0]['@type'] = 'OParlBody'
-    data[0]['@id'] = data[0]['_id']
-    del data[0]['config']
-    return data[0]
+    return oparl_body_process_dataset(data=data[0], params=params)
   elif len(data) == 0:
     abort(404)
 

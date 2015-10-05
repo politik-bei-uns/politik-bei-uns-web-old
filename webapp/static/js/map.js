@@ -2,9 +2,34 @@
 $(document).ready(function(){
   
   OpenRIS.regionLoad()
+
+  /********** REGION **********/
   
-  var map = new L.Map('map', {/*scrollWheelZoom: false*/});
-  //var maplayers = [];
+  // register post region change actions
+  OpenRIS.post_region_change = function() {
+    map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom).addLayer(backgroundLayer);
+    window.history.pushState(String(Date.now()), document.title, "/?r=" + OpenRIS.region.id);
+    
+    // update search examples
+    if ($('#search-examples')) {
+      $('#search-examples').html('');
+      $('#search-examples').append(document.createTextNode('Beispiele: '));
+      $.each(OpenRIS.region.keyword, function(id, keyword){
+        $('<a/>')
+          .text(keyword)
+          .attr({'href': '/suche/?r=' + OpenRIS.region.id + '&q=' + encodeURI(keyword)})
+          .appendTo('#search-examples');
+        if (OpenRIS.region.keyword.length > id + 1)
+          $('#search-examples').append(document.createTextNode(', '));
+      });
+    }
+    $('#qinput-region').val(OpenRIS.region.id);
+    changePositionTransform();
+  }
+  
+  /********** MAP **********/
+  
+  var map = new L.Map('map', {});
   var markerLayerGroup = new L.LayerGroup();
   map.addLayer(markerLayerGroup);
   
@@ -20,61 +45,47 @@ $(document).ready(function(){
   
   map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom).addLayer(backgroundLayer);
   
+  
+  /********** GEO SEARCH **********/
+  
   if (search_data.address) {
     $('#address').val(search_data.address);
     handleLocationInput();
   }
   
-  // set to user position, if set and within cologne
-  /*OpenRIS.session({}, function(data){
-    sessionData = data.response;
-    //console.log("sessionData:", sessionData);
-    if (typeof sessionData != 'undefined' &&
-      typeof sessionData.lat != 'undefined' &&
-      typeof sessionData.lon != 'undefined' &&
-      sessionData.lat !== '' && sessionData.lon !== '' &&
-      sessionData.lat !== null && sessionData.lon !== null) {
-        setUserPosition(parseFloat(sessionData.lat),
-          parseFloat(sessionData.lon));
-      if ($('#street').val() === '' && typeof sessionData.location_entry != 'undefined') {
-        lastLocationEntry = sessionData.location_entry;
-        $('#street').val(sessionData.location_entry);
-      }
-    } else {
-      /*
-      if (Modernizr.geolocation) {
-        console.log("Asking Browser for location");
-        navigator.geolocation.getCurrentPosition(setGeoPositionFromNavigator, handleGeoPositionError);
-      }
-      */
-  //  }
-  //});
+  OpenRIS.loadLiveSearch();
+  $('<p>').attr('id', 'address-live').css({'top': $('#address').height(), 'width': $('#address').width()}).appendTo($('#address-box'));
   
-  // register post region change actions
-  OpenRIS.post_region_change = function() {
-    map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom).addLayer(backgroundLayer);
-    window.history.pushState(String(Date.now()), document.title, "/?r=" + OpenRIS.region.id);
-    
-    // update street description
-    if (OpenRIS.region.type == 1)
-      $('#address-label').text('Straße:');
-    else
-      $('#address-label').text('Straße und Stadt:');
-    // update search examples
-    if ($('#search-examples')) {
-      $('#search-examples').html('');
-      $('#search-examples').append(document.createTextNode('Beispiele: '));
-      $.each(OpenRIS.region.keyword, function(id, keyword){
-        $('<a/>')
-          .text(keyword)
-          .attr({'href': '/suche/?q=' + encodeURI(keyword)})
-          .appendTo('#search-examples');
-        if (OpenRIS.region.keyword.length > id + 1)
-          $('#search-examples').append(document.createTextNode(', '));
-      });
+  $('#address').searchbox({
+    'url': '/api/locations',
+    'param': 'l',
+    'show_results': function(result) {
+      result = result['response'];
+      result_html = '<ul>';
+      if (result.length) {
+        $('#address-live').css({'display': 'block'});
+        for (i = 0; i < result.length; i++) {
+          result_html += '<li data-point="' + result[i]['point'] + '\">' + result[i]['name'] + ', ';
+          if (result[i].hasOwnProperty('postalcode'))
+            result_html += result[i]['postalcode'] + ' ';
+          result_html += result[i]['bodyName'] + '</li>';
+        }
+        result_html += '</ul>';
+        $('#address-live').html(result_html);
+        $('#address-live li').click(function() {
+          point = $(this).attr('data-point');
+          point = point.split(',');
+          search_data['lat'] = point[0]
+          search_data['lon'] = point[1]
+          $('#address').val($(this).text());
+          $('#address-live').css({'display': 'none'});
+          $('#position-prompt-submit').trigger('click');
+        });
+      }
+      else
+        $('#address-live').css({'display': 'none'});
     }
-    changePositionTransform();
-  }
+  });
   
   
   var locationPrompt = $('#position-prompt');
@@ -87,26 +98,54 @@ $(document).ready(function(){
     evt.preventDefault();
     handleLocationInput();
   });
+  
   $('#position-prompt-form').submit(function(evt){
     evt.preventDefault();
     handleLocationInput();
   });
+  
   $('#address').keydown(function(evt){
     // Enter abfangen
     if (evt.keyCode == 13) {
       evt.preventDefault();
-      $('#position-prompt-submit').trigger('click');
+      if ($('#address-live li.highlighted').length) {
+        $('#address-live li.highlighted').trigger('click');
+      }
+      else
+        $('#position-prompt-submit').trigger('click');
+    }
+    // Pfeil hoch abfangen
+    if (evt.keyCode == 38) {
+      evt.preventDefault();
+      if ($('#address-live li.highlighted').length) {
+        before = $('#address-live li.highlighted').prev();
+        console.log(before);
+        if (before.length) {
+          $('#address-live li.highlighted').removeClass('highlighted');
+          before.addClass('highlighted');
+        }
+      }
+    }
+    // Pfeil runter abfangen
+    if (evt.keyCode == 40) {
+      evt.preventDefault();
+      if ($('#address-live li.highlighted').length) {
+        next = $('#address-live li.highlighted').next();
+        if (next.length) {
+          $('#address-live li.highlighted').removeClass('highlighted');
+          next.addClass('highlighted');
+        }
+      }
+      else
+        $('#address-live li').first().addClass('highlighted');
     }
   });
   
-  $('#submit').click(function(evt){
-    evt.preventDefault();
-    $('#search-form').trigger('submit');
+  $('#position-prompt-form').focusout(function() {
+    $('#address-live').fadeOut(250);
   });
   
   
-  // Speichert die Session-Daten, aber setzt - anders als oben -
-  // die Karte nicht neu
   function handleSessionResponse(data){
     sessionData = data.response;
   }
@@ -114,139 +153,42 @@ $(document).ready(function(){
   function handleLocationInput() {
     resetMap();
     $('#position-prompt-submit');
-    $('#position-prompt .spinner').css({visibility: 'visible'});
     $('#position-prompt .error').remove();
     $('#location-prompt-resultchoice').remove();
     var address = $('#address').val();
-    // check if street is available
-    if (address !== '') {
-      data = {
-        address: address,
-        region: OpenRIS.region.id
-      };
-      $.getJSON('/api/proxy/geocode', data, function(places){
-        $('#position-prompt .spinner').css({visibility: 'hidden'});
-        if (places.result.length === 0) {
-          handleLocationLookupError('NOT_FOUND');
-        } else {
-          var places_filtered = OpenRIS.filterGeocodingChoices(places.result);
-          if (places_filtered.length === 0) {
-            handleLocationLookupError('NOT_FOUND');
-          } else if (places_filtered.length > 1) {
-            // Nutzer muss aus mehreren Optionen auswählen
-            var choice = $(document.createElement('div'));
-            choice.attr('id', 'location-prompt-resultchoice');
-            choice.attr('class', 'content middle');
-            choice.css({display: 'none'});
-            choice.append('<div><span>Bitte wähle einen der folgenden Orte:</span></div>');
-            for (var n in places_filtered) {
-              // Marker auf der Karte
-              var defaultMarker = new L.Icon({
-                iconUrl: '/static/img/leaflet/marker-icon.png',
-                shadowUrl: '/static/img/leaflet/marker-shadow.png',
-                iconSize:     [25, 41],
-                shadowSize:   [41, 41],
-                iconAnchor:   [13, 41],
-                shadowAnchor: [12, 41],
-                popupAnchor:  [0, 0]
-              });
-              var markerLocation = new L.LatLng(parseFloat(places_filtered[n].lat), parseFloat(places_filtered[n].lon));
-              var marker = new L.Marker(markerLocation, {title: places_filtered[n].osm_id, icon: defaultMarker});
-              marker.addEventListener("mouseover", function(evt){
-                // Achtung! ID des Highlight-Elements wird als title übergeben
-                $('#location-prompt-resultchoice a').removeClass('highlight');
-                $('#location-prompt-resultchoice .choicelink.' + evt.target.options.title).addClass('highlight');
-              });
-              marker.addEventListener("mouseout", function(evt){
-                $('#location-prompt-resultchoice a').removeClass('highlight');
-              });
-              marker.addEventListener("click", function(evt){
-                $('#location-prompt-resultchoice a').removeClass('highlight');
-                $('#location-prompt-resultchoice .choicelink.' + evt.target.options.title).trigger('click');
-              });
-              markerLayerGroup.addLayer(marker);
-              // Auswahllinks
-              var choicelink = $(document.createElement('a')).attr('href', '#');
-              var choicetext = '';
-              if (places_filtered[n].address.suburb) {
-                choicetext = places_filtered[n].address.suburb;
-              } else {
-                choicetext = places_filtered[n].address.road;
-              }
-              var pc_shown = false;
-              if (places_filtered[n].address.postcode) {
-                choicetext += ', ' + places_filtered[n].address.postcode;
-                pc_shown = true;
-              }
-              if (!pc_shown)
-                choicetext += ','
-              if (places_filtered[n].address.city)
-                choicetext += ' ' + places_filtered[n].address.city
-              else if (places_filtered[n].address.town)
-                choicetext += ' ' + places_filtered[n].address.town
-              else if (places_filtered[n].address.hamlet)
-                choicetext += ' ' + places_filtered[n].address.hamlet
-              else if (places_filtered[n].address.village)
-                choicetext += ' ' + places_filtered[n].address.village
-              else if (places_filtered[n].address.county)
-                choicetext += ' ' + places_filtered[n].address.county
-              choicelink.text(choicetext);
-              choicelink.attr('class', 'choicelink ' + places_filtered[n].osm_id);
-              choicelink.mouseover({resultObject:places_filtered[n], mapmarker: marker}, function(evt){
-                // Marker zentrieren und anzoomen
-                map.setView(new L.LatLng(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon)), 12);
-              });
-              choicelink.click({resultObject:places_filtered[n]}, function(evt){
-                evt.preventDefault();
-                $('#location-prompt-resultchoice').slideUp('fast', function(){
-                  $('#location-prompt-resultchoice').remove();
-                });
-                var entry_string = evt.data.resultObject.address.road;
-                pc_shown = false;
-                if (evt.data.resultObject.address.postcode) {
-                  pc_shown = true;
-                  entry_string += ', ' + evt.data.resultObject.address.postcode;
-                }
-                if (!pc_shown)
-                  entry_string += ','
-                if (evt.data.resultObject.address.city)
-                  entry_string += ' ' + evt.data.resultObject.address.city
-                else if (evt.data.resultObject.address.town)
-                  entry_string += ' ' + evt.data.resultObject.address.town
-                else if (evt.data.resultObject.address.hamlet)
-                  entry_string += ' ' + evt.data.resultObject.address.hamlet
-                else if (evt.data.resultObject.address.village)
-                  entry_string += ' ' + evt.data.resultObject.address.village
-                else if (evt.data.resultObject.address.county)
-                  entry_string += ' ' + evt.data.resultObject.address.county
-                $('#address').val(entry_string);
-                lastLocationEntry = entry_string;
-                sessionParams = {
-                  'address': entry_string,
-                  'lat': evt.data.resultObject.lat,
-                  'lon': evt.data.resultObject.lon,
-                  'osm_id': evt.data.resultObject.osm_id
-                };
-                setUserPosition(parseFloat(evt.data.resultObject.lat), parseFloat(evt.data.resultObject.lon));
-                OpenRIS.session(sessionParams, handleSessionResponse);
-              });
-              choice.append(choicelink);
-              choice.append(' ');
-            }
-            $('#position-form-container').after(choice);
-            $('#location-prompt-resultchoice').slideDown('fast');
-          } else {
-            // exakt ein Treffer
-            setUserPosition(parseFloat(places.result[0].lat), parseFloat(places.result[0].lon));
-            sessionParams = {
-              'address': address,
-              'lat': places.result[0].lat,
-              'lon': places.result[0].lon
-            };
-            OpenRIS.session(sessionParams, handleSessionResponse);
-          }
+    if (!search_data['lat'] || !search_data['lon']) {
+      $.get('/api/locations?l=' + address, function(data) {
+        if (data['response'].length) {
+          var point = data['response'][0]['point'].split(',');
+          search_data['lat'] = point[0];
+          search_data['lon'] = point[1];
+          location_string = data['response'][0]['name'] + ', ';
+          if (data['response'][0]['postalcode'])
+            location_string += data['response'][0]['postalcode'] + ' ';
+          location_string += data['response'][0]['bodyName'] + ' ';
+          $('#address').val(location_string);
+          search_data['address'] = location_string;
+          setUserPosition(parseFloat(search_data['lat']), parseFloat(search_data['lon']));
+          sessionParams = {
+            'address': address,
+            'lat': search_data['lat'],
+            'lon': search_data['lon']
+          };
+          OpenRIS.session(sessionParams, handleSessionResponse);
+        }
+        else {
+          //error
         }
       });
+    }
+    else {
+      setUserPosition(parseFloat(search_data['lat']), parseFloat(search_data['lon']));
+      sessionParams = {
+        'address': address,
+        'lat': search_data['lat'],
+        'lon': search_data['lon']
+      };
+      OpenRIS.session(sessionParams, handleSessionResponse);
     }
   }
   
@@ -270,7 +212,9 @@ $(document).ready(function(){
     $('#position-prompt').show();
     $('#address').focus();
     $('#address').select();
-    search_data['address'] = null;
+    search_data = {
+      'address': null
+    };
     sessionParams = {
       'address': null,
       'lat': null,
@@ -278,18 +222,6 @@ $(document).ready(function(){
     };
     OpenRIS.session(sessionParams, handleSessionResponse);
     resetMap();
-  }
-  
-  function handleLocationLookupError(reason){
-    var msg = $(document.createElement('div')).attr('class', 'error');
-    if (reason == 'NEED_DETAILS') {
-      msg.append('Bitte gib den Ort genauer an, z.B. durch Angabe einer Hausnummer oder PLZ.');
-    } else if (reason == 'NOT_FOUND') {
-      msg.append('Der angegebene Ort wurde nicht gefunden. Vielleicht haben Sie ihn falsch geschrieben?');
-    } else {
-      msg.append('Bei der Ortssuche ist ein unbekannter Fehler ausgetreten. Bitte versuche es noch einmal.');
-    }
-    locationPrompt.append(msg);
   }
   
   function setUserPosition(lat, lon) {
@@ -357,50 +289,35 @@ $(document).ready(function(){
     });
   }
   
-  /*
-  map.on('click', onMapClick);
-  var popup = new L.Popup();  
-  function onMapClick(e) {
-    var latlngStr = '(' + e.latlng.lat.toFixed(3) + ', ' + e.latlng.lng.toFixed(3) + ')';
-    
-    popup.setLatLng(e.latlng);
-    popup.setContent("You clicked the map at " + latlngStr);
-    map.openPopup(popup);
-  }
-  */
+  /********** KEYWORD SEARCH **********/
   
-  /**
-   * Speichert die zuletzt vom Nutzer angegebene Position in der Session
-   */
-  function saveGeoPosition(latitude, longitude){
-    $.getJSON('/api/session', {lat: latitude, lon: longitude}, function(data){});
-  }
+  $('#qinput-submit').click(function(evt){
+    evt.preventDefault();
+    $('#search-form').trigger('submit');
+  });
   
-  /**
-   * Callback function for navigator.geolocation.getCurrentPosition
-   * in case of an error
-   */
-  function handleGeoPositionError(){
-    //console.log('handleGeoPositionError(): User has not specified position');
-  }
+  $('<p>').attr('id', 'qinput-live').css({'top': $('#qinput').height(), 'width': $('#qinput').width()}).appendTo($('#qinput-box'));
   
-  /**
-   * Callback function for navigator.geolocation.getCurrentPosition
-   * in case of success
-   */
-  /*
-  function setGeoPositionFromNavigator(pos){
-    console.log('setGeoPositionFromNavigator:', pos);
-    if ( pos.coords.latitude > lat_min &&
-      pos.coords.latitude < lat_max &&
-      pos.coords.longitude > lon_min &&
-      pos.coords.longitude < lon_max) {
-      setUserPosition(pos.coords.latitude, pos.coords.longitude);
-      sessionParams = {'lat': pos.coords.latitude, 'lon': pos.coords.longitude};
-      OpenRIS.session(sessionParams, handleSessionResponse);
-    } else {
-      console.log('User ist nicht in Köln :(');
+  $('#qinput').searchbox({
+    'url': '/api/papers-live',
+    'param': 'l',
+    'show_results': function(result) {
+      result = result['response'];
+      result_html = '<ul>';
+      if (result.length) {
+        $('#qinput-live').css({'display': 'block'});
+        for (i = 0; i < result.length; i++) {
+          result_html += '<li data-point="' + result[i]['point'] + '\">' + result[i]['name'] + ', ';
+          if (result[i].hasOwnProperty('postalcode'))
+            result_html += result[i]['postalcode'] + ' ';
+          result_html += result[i]['bodyName'] + '</li>';
+        }
+        result_html += '</ul>';
+        $('#qinput-live').html(result_html);
+      }
+      else
+        $('#address-live').css({'display': 'none'});
     }
-  }
-  */
+  });
+  
 });

@@ -1,20 +1,16 @@
 # encoding: utf-8
 
-from webapp import mongo, app
-from flask.ext.pymongo import PyMongo
-#import pyes
-from elasticsearch import Elasticsearch
 import util
-
-from bson import ObjectId, DBRef
 import gridfs
 import re
-
 import urllib2
 import datetime
 import dateutil.relativedelta
 
 from flask import abort
+from bson import ObjectId, DBRef
+from webapp import app, mongo, es
+from flask.ext.pymongo import PyMongo
 
 def get_config(body_uid=False):
   """
@@ -23,9 +19,8 @@ def get_config(body_uid=False):
   config = mongo.db.config.find_one({})
   if '_id' in config:
     del config['_id']
-  regions = mongo.db.region.find({})
   config['regions'] = {}
-  for region in regions:
+  for region in mongo.db.region.find({}):
     bodies = []
     for body in region['body']:
       bodies.append(str(body.id))
@@ -33,6 +28,9 @@ def get_config(body_uid=False):
     region['id'] = str(region['_id'])
     del region['_id']
     config['regions'][region['id']] = region
+  config['bodies'] = {}
+  for body in mongo.db.body.find({}):
+    config['bodies'][str(body['_id'])] = body
   return config
 
 def merge_dict(self, x, y):
@@ -316,8 +314,6 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
         'minimum_should_match': 1
       }
     })
-  es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
-  es.indices.refresh(app.config['es_paper_index'] + '-latest')
   
   # Let's see if there are some " "s in our search string
   matches = re.findall("&#34;(.*?)&#34;", q, re.DOTALL)
@@ -420,8 +416,6 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
 
 
 def query_paper_num(region_id, q):
-  es = Elasticsearch([app.config['ES_HOST']+':'+str(app.config['ES_PORT'])])
-  es.indices.refresh(app.config['es_paper_index'] + '-latest')
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
@@ -448,29 +442,99 @@ def query_paper_num(region_id, q):
       }
     },
     size = 1,
-    sort = 'publishedDate:DESC'
+    sort = 'publishedDate:desc'
   )
   if result['hits']['total']:
     return {
       'num': result['hits']['total'],
       'name': result['hits']['hits'][0]['fields']['name'][0],
-      'publishedDate': result['hits']['hits'][0]['fields']['publishedDate'][0]
+      'publishedDate': result['hits']['hits'][0]['fields']['publishedDate'][0] if 'publishedDate' in result['hits']['hits'][0]['fields'] else None
     }
   else:
     return {
       'num': result['hits']['total']
     }
 
+def get_papers_live(search_string):
+  query_parts = []
+  for search_string in search_string.replace(',', '').split():
+    query_parts.append({
+              'multi_match': {
+                'fields': ['file.fulltext', 'file.name', 'name'],
+                'type': 'phrase_prefix',
+                'query': search_string
+              }
+            })
+  result = es.search(
+    index = app.config['es_paper_index'] + '-latest',
+    doc_type = 'paper',
+    fields = 'name',
+    body = {
+      'query': {
+        'bool': {
+          'must': query_parts
+        }
+      }
+    },
+    size = 10
+  )
+  search_results = []
+  if result['hits']['total']:
+    for search_result in result['hits']['hits']:
+      tmp_search_result = {
+        'name': search_result['fields']['name'][0],
+        'bodyName': search_result['fields']['bodyName'][0],
+        'point': search_result['fields']['point'][0]
+      }
+      if 'postalcode' in location['fields']:
+        tmp_search_result['postalcode'] = search_result['fields']['postalcode'][0]
+      search_results.append(tmp_search_result)
+  return search_results
 
-def get_locations_by_name(streetname):
+def get_locations_by_name(location_string, region_id):
   """
   Liefert Location-Einträge für einen Namen zurück.
   """
-  cursor = mongo.db.locations.find({'name': streetname})
-  streets = []
-  for street in cursor:
-    streets.append(street)
-  return streets
+  query_parts = []
+  for location_string in location_string.replace(',', '').split():
+    query_parts.append({
+              'multi_match': {
+                'fields': ['name', 'bodyName', 'postalcode'],
+                'type': 'phrase_prefix',
+                'query': location_string
+              }
+            })
+  query_parts.append({
+    'terms': {
+      'bodyId': app.config['regions'][region_id]['body'],
+      'minimum_should_match': 1
+    }
+  })
+  result = es.search(
+    index = app.config['es_location_index'] + '-latest',
+    doc_type = 'street',
+    fields = 'name,bodyName,postalcode,point',
+    body = {
+      'query': {
+        'bool': {
+          'must': query_parts
+        }
+      }
+    },
+    size = 10
+  )
+  locations = []
+  if result['hits']['total']:
+    for location in result['hits']['hits']:
+      tmp_location = {
+        'name': location['fields']['name'][0],
+        'bodyName': location['fields']['bodyName'][0],
+        'point': location['fields']['point'][0]
+      }
+      if 'postalcode' in location['fields']:
+        tmp_location['postalcode'] = location['fields']['postalcode'][0]
+      locations.append(tmp_location)
+  return locations
 
 
 def get_locations(lon, lat, radius=1000):
@@ -484,15 +548,26 @@ def get_locations(lon, lat, radius=1000):
   if type(radius) != int:
     radius = int(radius)
   earth_radius = 6371000.0
-  res = mongo.db.locations.aggregate([{
-    '$geoNear': {
-      'near': [lon, lat],
-      'distanceField': 'distance',
-      'distanceMultiplier': earth_radius,
-      'maxDistance': (float(radius) / earth_radius),
-      'spherical': True
-    }
-  }])
+  bodies = []
+#  for single_body_id, single_body in app.config['bodies'].iteritems():
+#    bodies.append(DBRef('body', single_body['_id']))
+  res = mongo.db.locations.aggregate([
+    {
+      '$geoNear': {
+        'near': [lon, lat],
+        'distanceField': 'distance',
+        'distanceMultiplier': earth_radius,
+        'maxDistance': (float(radius) / earth_radius),
+        'spherical': True
+      }
+    } #,
+#    {
+#      'body':
+#        {
+#          '$in': bodies
+#        }
+#    }
+  ])
   streets = []
   for street in res['result']:
     street['distance'] = int(round(street['distance']))

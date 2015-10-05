@@ -1,13 +1,4 @@
-# Robots, Spider und Crawler sind willkommen!
-#
-# Bitte nur 1 Thread, dem Server und anderen Nutzern zuliebe!
-#
-# Wenn Sie an strukturierten Daten interessiert sind, schauen Sie
-# sich bitte
-#
-#    https://politik-bei-uns.de/api/
-#
-# an! Das koennte Ihnen Zeit und uns Server-Ressourcen sparen. :)
+# Robots, Spider und Crawler abseits der Suchmaschinen bitte die OParl-API verwenden. Danke!
 
 Sitemap: {{ config.base_url }}/static/sitemap/sitemap.xml
 
@@ -15,21 +6,25 @@ User-agent: *
 Disallow: /suche/
 Disallow: /api/
 Disallow: /admin/
+Disallow: /file/*/download
 
 User-agent: Googlebot
 Disallow: /suche/
 Disallow: /api/
 Disallow: /admin/
+Disallow: /file/*/download
 Disallow: /oparl/
 
 User-agent:Yahoo! Slurp
 Disallow: /suche/
 Disallow: /api/
 Disallow: /admin/
+Disallow: /file/*/download
 Disallow: /oparl/
 
 User-agent: bingbot
 Disallow: /suche/
 Disallow: /api/
 Disallow: /admin/
+Disallow: /file/*/download
 Disallow: /oparl/

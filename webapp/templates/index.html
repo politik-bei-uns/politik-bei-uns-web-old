@@ -49,23 +49,24 @@ var CONF = {
       <form id="position-prompt-form" action="/" method="GET">
         <div class="question">Sehen Sie sich an, was die Politik in Ihrer Umgebung macht:</div>
         <div>
-          <span class="mobilerow"><label for="address" id='address-label'>Straße und Stadt:</label> <input id="address" type="text" name='address' title="Straße und Stadt, in der Sie wohnen oder für die Sie sich interessieren"/></span>
+          <label for="address" id='address-label'>Ort:</label> <p id="address-box"><input id="address" type="text" name='address' title="Straße und Stadt, in der Sie wohnen oder für die Sie sich interessieren" autocomplete="off" /></p>
           <a href="#" id='position-prompt-submit' class="awesome extrawide">Anzeigen</a>
-          <span class="spinner placeholder"></span>
         </div>
       </form>
     </div>
-    <p style="text-align: center;">Bislang gibt es Daten für die Städte Bochum, Köln, Moers und Wuppertal. Die Suche benötigt die Angabe einer Straße und Stadt für sinnvolle Ergebnisse.</p>
   </div>
   <div id="map" style="margin-top: 3px;"></div>
   <div class="content bottom searchform">
     <div class="header">&hellip; oder suchen Sie nach Themen, die Sie interessieren:</div>
     <form id="search-form" method="get" action="/suche/" accept-charset="utf-8">
-      <input type="text" id="qinput" name="q" value="" />
-      <a href="#" id="submit" class="awesome extrawide">Suchen</a>
+			<p id="qinput-box">
+				<input type="text" id="qinput" name="q" value="" autocomplete="off" />
+			</p>
+			<a href="#" id="qinput-submit" class="awesome extrawide">Suchen</a>
+			<input type="hidden" id="qinput-region" name="r">
     </form>
     <div class="examples" id='search-examples'>
-      Beispiele: {% for example in config['regions'][region_id]['keyword'] %}<a href="/suche/?q={{ example }}">{{ example }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+      Beispiele: {% for example in config['regions'][region_id]['keyword'] %}<a href="/suche/?r={{ region_id }}&amp;q={{ example }}">{{ example }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
     </div>
   </div>
 </div>

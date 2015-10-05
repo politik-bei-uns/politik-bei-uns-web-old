@@ -51,7 +51,7 @@ Now you should see ris-web up and running at [http://localhost:23000](http://loc
 
 ###Lizenz
 
-Der Code steht unter einer MIT-artigen [Lizenz](https://github.com/okfde/ris-web/blob/master/LIZENZ.txt).
+Der Code steht unter der [http://opensource.org/licenses/BSD-3-Clause](BSD 3-Clause License)
 
 ###Geschichte
 

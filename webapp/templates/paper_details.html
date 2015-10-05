@@ -30,9 +30,15 @@ var ok_document_url = '{{ paper._id }}';
 {% block riscontent %}
 <div id="docdetails">
   <div class="content top">
-  <h1>{{ paper.name }}</h1>
+  <h1>{{ paper.name|truncate(70) }}</h1>
   <table class="metadata">
     <tbody>
+    {% if paper.name|truncate(70) != paper.name %}
+    <tr>
+      <td class="label">Vollst. Name:</td>
+      <td class="value">{{ paper.name }}</td>
+    </tr>
+    {% endif %}
     {% if paper.paperType %}
     <tr>
       <td class="label">Art des Dokuments:</td>
@@ -43,6 +49,24 @@ var ok_document_url = '{{ paper._id }}';
     <tr>
       <td class="label">Erstellt am:</td>
       <td class="value">{{ paper.publishedDate.strftime('%d.%m.%Y') }}</td>
+    </tr>
+    {% endif %}
+    {% if paper.superordinatedPaper %}
+    <tr>
+      <td class="label">Übergeordnete Drucksache:</td>
+      <td class="value">{% for superordinatedPaper in paper.superordinatedPaper %}<a href="/paper/{{ superordinatedPaper._id }}">{{ superordinatedPaper.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
+    </tr>
+    {% endif %}
+    {% if paper.subordinatedPaper %}
+    <tr>
+      <td class="label">Untergeordnete Drucksache:</td>
+      <td class="value">{% for subordinatedPaper in paper.subordinatedPaper %}<a href="/paper/{{ subordinatedPaper._id }}">{{ subordinatedPaper.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
+    </tr>
+    {% endif %}
+    {% if paper.relatedPaper %}
+    <tr>
+      <td class="label">Zusammenhängende Drucksache:</td>
+      <td class="value">{% for relatedPaper in paper.relatedPaper %}<a href="/paper/{{ relatedPaper._id }}">{{ relatedPaper.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
     </tr>
     {% endif %}
     <tr>
@@ -102,11 +126,9 @@ var ok_document_url = '{{ paper._id }}';
   {% if paper.mainFile %}
   {% if paper.mainFile.thumbnails %}
   {% set twidth = (paper.mainFile.thumbnails['300']|sum(attribute='width') + (11 * paper.mainFile.thumbnails['300']|length)) %}
+  {% set numpages = paper.mainFile.thumbnails['300']|length %}
   {% endif %}
   <div class="attachment content middle" id="{{ paper.mainFile._id }}">
-    {% if paper.mainFile.thumbnails %}
-    {% set numpages = paper.mainFile.thumbnails['300']|length %}
-    {% endif %}
     <h2>Primäre Anlage: {{ paper.mainFile.name|truncate(100) }}
       {% if numpages %}
       ({{ numpages }} Seiten)
@@ -156,8 +178,8 @@ var ok_document_url = '{{ paper._id }}';
     </table>
     {% if paper.mainFile.file %}
     <div class="actions">
-			<a target="_blank" href="/anhang/{{ paper.mainFile._id }}" class="awesome">Anhang öffnen</a>
-			<span class="typesize">{{ (paper.mainFile.size / 1024)|round(0)|int }} KB PDF<!-- | <span id="file_{{ paper.mainFile._id }}" class="warn response">Anhang melden</span-->
+			<a href="/file/{{ paper.mainFile._id }}" class="awesome">Details zum Anhang</a> <a href="/file/{{ paper.mainFile._id }}/download" class="awesome">Anhang speichern</a>
+			<span class="typesize">{{ (paper.mainFile.size / 1024)|round(0)|int }} KB PDF
     </div>
     {% endif %}
   {% endif%}
@@ -222,8 +244,8 @@ var ok_document_url = '{{ paper._id }}';
     </table>
     {% if file.file %}
     <div class="actions">
-			<a target="_blank" href="/anhang/{{ file._id }}" class="awesome">Anhang öffnen</a>
-			<span class="typesize">{{ (file.size / 1024)|round(0)|int }} KB PDF<!-- | <span id="file_{{ file._id }}" class="warn response">Anhang melden</span-->
+			<a href="/file/{{ file._id }}" class="awesome">Details zum Anhang</a> <a href="/file/{{ file._id }}/download" class="awesome">Anhang speichern</a>
+			<span class="typesize">{{ (file.size / 1024)|round(0)|int }} KB PDF
     </div>
     {% endif %}
   {% endif%}

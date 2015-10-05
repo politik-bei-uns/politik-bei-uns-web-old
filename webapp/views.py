@@ -137,8 +137,58 @@ def favicon():
 def robots_txt():
   return render_template('robots.txt')
 
-
+# Backward compatibility
 @app.route("/anhang/<string:file_id>")
+def file_show_redirect(file_id):
+  return redirect('/file/%s' % file_id, code=301)
+
+
+@app.route("/file/<string:file_id>")
+def file_show(file_id):
+  """
+  Anzeigen eines Files
+  """
+  result = db.get_file(search_params = {'_id': ObjectId(file_id)},
+                        deref = {'values': ['body']})
+  if len(result) == 0:
+    abort(404)
+  # add meeting
+  usage = []
+  meeting_invitation = db.get_meeting(search_params = {'invitation': DBRef('file', ObjectId(file_id))})
+  for item in meeting_invitation:
+    usage.append({ 'data': item, 'type': 'meeting', 'function': 'invitation'})
+  meeting_resultsProtocol = db.get_meeting(search_params = {'resultsProtocol': DBRef('file', ObjectId(file_id))})
+  for item in meeting_resultsProtocol:
+    usage.append({ 'data': item, 'type': 'meeting', 'function': 'resultsProtocol'})
+  meeting_verbatimProtocol = db.get_meeting(search_params = {'verbatimProtocol': DBRef('file', ObjectId(file_id))})
+  for item in meeting_verbatimProtocol:
+    usage.append({ 'data': item, 'type': 'meeting', 'function': 'verbatimProtocol'})
+  meeting_auxiliaryFile =  db.get_meeting(search_params = {'auxiliaryFile': DBRef('file', ObjectId(file_id))})
+  for item in meeting_auxiliaryFile:
+    usage.append({ 'data': item, 'type': 'meeting', 'function': 'auxiliaryFile'})
+  
+  # add agendaItem
+  agendaItem_resolutionFile = db.get_agendaItem(search_params = {'resolutionFile': DBRef('file', ObjectId(file_id))})
+  for item in agendaItem_resolutionFile:
+    usage.append({ 'data': item, 'type': 'agendaItem', 'function': 'resolutionFile'})
+  agendaItem_auxiliaryFile = db.get_agendaItem(search_params = {'auxiliaryFile': DBRef('file', ObjectId(file_id))})
+  for item in agendaItem_auxiliaryFile:
+    usage.append({ 'data': item, 'type': 'agendaItem', 'function': 'auxiliaryFile'})
+  
+  # add paper
+  paper_mainFile = db.get_paper(search_params = {'mainFile': DBRef('file', ObjectId(file_id))})
+  for item in paper_mainFile:
+    usage.append({ 'data': item, 'type': 'paper', 'function': 'mainFile'})
+  paper_auxiliaryFile = db.get_paper(search_params = {'auxiliaryFile': DBRef('file', ObjectId(file_id))})
+  for item in paper_auxiliaryFile:
+    usage.append({ 'data': item, 'type': 'paper', 'function': 'auxiliaryFile'})
+  
+  if len(usage):
+    result[0]['usage'] = usage
+  return render_template('file_details.html', file=result[0])
+
+
+@app.route("/file/<string:file_id>/download")
 def file_download(file_id):
   """
   Download eines Files
@@ -228,13 +278,13 @@ def suche_feed():
   response.headers['Cache-Control'] = util.cache_max_age(hours=24)
   return response
 
-@app.route("/paper/<path:id>/")
+@app.route("/paper/<string:id>/")
 def view_paper(id):
   """
   Gibt Dokumenten-Detailseite aus
   """
   result = db.get_paper(search_params = {'_id': ObjectId(id)},
-                        deref = {'values': ['body', 'mainFile', 'auxiliaryFile', 'subordinatedPaper', 'superordinatedPaper']})
+                        deref = {'values': ['body', 'mainFile', 'auxiliaryFile', 'relatedPaper', 'subordinatedPaper', 'superordinatedPaper']})
   if len(result) == 0:
     abort(404)
   result = result[0]
@@ -251,10 +301,6 @@ def view_paper(id):
       meeting_result = db.get_meeting(search_params = {'agendaItem': DBRef('agendaItem', result['consultation'][consultation_id]['agendaItem']['_id'])})
       if len(meeting_result):
         result['consultation'][consultation_id]['agendaItem']['meeting'] = meeting_result[0]
-  """references=[identifier],
-    get_attachments=True,
-    get_consultations=True,
-    get_thumbnails=True)"""
   return render_template('paper_details.html', paper=result)
 
 #@app.route("/admin")

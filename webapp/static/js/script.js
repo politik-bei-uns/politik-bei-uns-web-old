@@ -33,34 +33,6 @@ var OpenRIS = {
   },
   
   /**
-   * returns a list of position coordinates for a street name,
-   * as well as the average coordinates
-   */
-  locationsForStreet: function(name, list_nodes, callback) {
-    var contain = ['result', 'average'];
-    if (!list_nodes) {
-      contain = ['average'];
-    }
-    $.getJSON('/api/locations', {'street': name, 'contain': contain.join(',')}, callback);
-  },
-  
-  /**
-   * Does the same as locationsForStreet, but for a list of names.
-   * Requests are queued.
-   */
-  locationsForStreetsQueued: function(names, callback) {
-    for (var name in names) {
-      $.ajaxq('locationsForStreetsQueuedQueue', {
-        url: "/api/locations",
-        data: { street: names[name], output: 'averages'},
-        dataType: 'json',
-        cache: true,
-        success: callback
-      });
-    }
-  },
-  
-  /**
    * Fetch details for a document
    */
   paperDetails: function(id, callback) {
@@ -69,7 +41,6 @@ var OpenRIS = {
       output: 'meetings,files,thumbnails'}
     $.getJSON('/api/paper', options, callback);
   },
-  
   
   regionLoad: function() {
     // copy region_data in region object
@@ -313,81 +284,90 @@ var OpenRIS = {
   },
   
   send_response: function(id) {
-      alert(id);
-      return false;
+    alert(id);
+    return false;
+  },
+  
+  loadLiveSearch: function() {
+
+    $.searchbox = {}
+    
+    $.extend(true, $.searchbox, {
+      settings: {
+        url: '/search',
+        param: 'query',
+        dom_id: '#results',
+        delay: 100,
+        loading_css: '#loading',
+        show_results: function(data) {
+          $($.searchbox.settings.dom_id).html(data)
+        }
+      },
+      
+      loading: function() {
+        $($.searchbox.settings.loading_css).show()
+      },
+      
+      resetTimer: function(timer) {
+        if (timer) clearTimeout(timer)
+      },
+      
+      idle: function() {
+        $($.searchbox.settings.loading_css).hide()
+      },
+      
+      process: function(terms) {
+        var path = $.searchbox.settings.url.split('?'),
+          query = [$.searchbox.settings.param, '=', terms].join(''),
+          base = path[0], params = path[1], query_string = query
+        
+        if (params) query_string = [params.replace('&amp;', '&'), query].join('&')
+        
+        $.get([base, '?', query_string].join(''), function(data) {
+          $.searchbox.settings.show_results(data);
+        })
+      },
+      
+      start: function() {
+        $(document).trigger('before.searchbox')
+        $.searchbox.loading()
+      },
+      
+      stop: function() {
+        $.searchbox.idle()
+        $(document).trigger('after.searchbox')
+      }
+    })
+    
+    $.fn.searchbox = function(config) {
+      var settings = $.extend(true, $.searchbox.settings, config || {})
+      
+      $(document).trigger('init.searchbox')
+      $.searchbox.idle()
+      
+      return this.each(function() {
+        var $input = $(this)
+        
+        $input
+        .focus()
+        .ajaxStart(function() { $.searchbox.start() })
+        .ajaxStop(function() { $.searchbox.stop() })
+        .keyup(function() {
+          if ($input.val() != this.previousValue) {
+            $.searchbox.resetTimer(this.timer)
+            
+            this.timer = setTimeout(function() {  
+              $.searchbox.process($input.val())
+            }, $.searchbox.settings.delay)
+            
+            this.previousValue = $input.val()
+          }
+        })
+      })
+    }
   }
 };
 
 
-
-/*
-TODO: Make this better.
-$(document).ready(function() {
-  $('span.response').each(function(){
-    $(this).click(function() {
-      //alert($(this).attr('id').substring(11));
-      $('#attachment_dialog').html(generateResponseContent($(this).attr('id').substring(11)));
-      $('#attachment_response_form').submit(function(){
-        var error = false;
-        //TODO: form handling 
-        if (!error) {
-          data = {
-            'id': $('#response_id').val(),
-            'name': $('#response_name').val(),
-            'email': $('#response_email').val(),
-            'type': $('#response_type').val(),
-            'message': $('#response_message').val(),
-            'sent_on': window.location.href,
-          }
-          $.post('/api/response', data).done(function(data) {
-            alert('Ihre Nachricht wurde gesendet.');
-          });
-          $('#attachment_dialog').dialog('close');
-        }
-        return(false);
-      });
-      $('#attachment_dialog').dialog('open');
-    });
-  });
-  $('<div/>', {
-    'id': 'attachment_dialog'
-  }).appendTo('body');
-  $('#attachment_dialog').dialog({
-    autoOpen: false,
-    draggable: false,
-    width: 600,
-    modal: true,
-    title: 'Senden einer Rückmeldung zu einem Anhang'
-  });
-});
-
-function generateResponseContent(id) {
-  var html = ''
-  html += '<form id="attachment_response_form">';
-  html += '<p>Name</p>'
-  html += '<input type="text" id="response_name" name="response_name" /></p>';
-  html += '<p>E-Mail</p>'
-  html += '<input type="text" id="response_email" name="response_email" /></p>';
-  html += '<h3>Thema</h3>';
-  html += '<select id="response_type">';
-  html += '<option id="response_type_0" value="0">- bitte wählen -</option>';
-  html += '<option id="response_type_2" value="2">Das Dokument verletzt Urheberrechte.</option>';
-  html += '<option id="response_type_3" value="3">Das Dokument verletzt den Datenschutz.</option>';
-  html += '<option id="response_type_4" value="4">Das Dokument hat / besteht aus leeren Seiten.</option>';
-  html += '<option id="response_type_5" value="5">Das Dokument kann nicht geöffnet werden / die Datei ist beschädigt.</option>';
-  html += '<option id="response_type_6" value="6">Das Dokument ist schwer lesbar.</option>';
-  html += '<option id="response_type_7" value="7">Das Dokument hat gedrehte Seiten.</option>';
-  html += '<option id="response_type_8" value="8">Das Dokument verfälscht die Suchergebnisse.</option>';
-  html += '<option id="response_type_1" value="1">Ich habe eine andere Frage / Anregung / Rückmeldung.</option>';
-  html += '</select>';
-  html += '<h3>Nachricht</h3>';
-  html += '<textarea id="response_message"></textarea>';
-  html += '<input type="hidden" value="' + id + '" id="response_id" />';
-  html += '<p><input type="submit" value="senden" /></p>';
-  html += '</form>';
   
-  return(html);
-}
-*/
-
 

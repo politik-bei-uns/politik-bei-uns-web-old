@@ -30,6 +30,7 @@ import db
 import datetime
 import time
 import sys
+import werkzeug
 
 from flask import Flask
 from flask import abort
@@ -39,10 +40,7 @@ from flask import request
 from flask import session
 from flask import redirect
 from flask import Response
-
-import werkzeug
-
-from webapp import app, mongo
+from webapp import app, mongo, es
 
 
 @app.route("/api/papers")
@@ -89,22 +87,47 @@ def api_papers():
   return response
 
 
-@app.route("/api/locations")
-def api_locations():
+@app.route("/api/papers-live")
+def api_papers_live():
   start_time = time.time()
   jsonp_callback = request.args.get('callback', None)
-  rs = util.get_rs()
-  street = request.args.get('street', '')
-  if street == '':
-    abort(400)
-  result = db.get_locations_by_name(street)
+  paper_string = request.args.get('p', '')
+  region = request.args.get('region', app.config['region_default'])
+  if paper_string:
+    result = db.get_papers_live(paper_string)
   ret = {
     'status': 0,
     'duration': round((time.time() - start_time) * 1000),
     'request': {
-      'street': street
+      'p': paper_string
     },
-    'response': result
+    'response': result if paper_string else []
+  }
+  json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+  if jsonp_callback is not None:
+    json_output = jsonp_callback + '(' + json_output + ')'
+  response = make_response(json_output, 200)
+  response.mimetype = 'application/json'
+  response.headers['Expires'] = util.expires_date(hours=24)
+  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
+  return response
+
+
+@app.route("/api/locations")
+def api_locations():
+  start_time = time.time()
+  jsonp_callback = request.args.get('callback', None)
+  location = request.args.get('l', '')
+  region = request.args.get('region', app.config['region_default'])
+  if location:
+    result = db.get_locations_by_name(location, region)
+  ret = {
+    'status': 0,
+    'duration': round((time.time() - start_time) * 1000),
+    'request': {
+      'l': location
+    },
+    'response': result if location else []
   }
   json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
   if jsonp_callback is not None:
@@ -204,7 +227,7 @@ def api_geocode():
 def api_regions():
   jsonp_callback = request.args.get('callback', None)
   result = []
-  regions=mongo.db.region.find()
+  regions=mongo.db.region.find().sort([('name', 1)])
   for region in regions:
     result.append({'id': region['_id'],
                    'type': region['type'],
@@ -257,18 +280,3 @@ def api_session():
   response.mimetype = 'application/json'
   return response
 
-""" TODO: make new
-@app.route("/api/response", methods=['POST'])
-def api_response():
-  attachment_id = request.form['id']
-  name = request.form['name']
-  email = request.form['email']
-  response_type = request.form['type']
-  message = request.form['message']
-  sent_on = request.form['sent_on']
-  ip = str(request.remote_addr)
-  db.add_response({'attachment_id': attachment_id, 'sent_on': sent_on, 'ip': ip, 'name': name, 'email': email, 'response_type': response_type, 'message': message})
-  response = make_response('1', 200)
-  response.mimetype = 'application/json'
-  return response
-"""
