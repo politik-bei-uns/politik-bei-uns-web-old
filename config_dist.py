@@ -1,31 +1,18 @@
 # encoding: utf-8
 
 """
-Globale Konfiguration für die Webapp und Kommandozeilen-Scripte
+Copyright (c) 2012 - 2015, Marian Steinbach, Ernesto Ruge
+All rights reserved.
 
-Die Einstellungen in dieser Datei müssen der jeweiligen Umgebung angepasst
-und der Name der Datei zu "config.py" geändert werden.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-Copyright (c) 2012 Marian Steinbach
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
-Hiermit wird unentgeltlich jeder Person, die eine Kopie der Software und
-der zugehörigen Dokumentationen (die "Software") erhält, die Erlaubnis
-erteilt, sie uneingeschränkt zu benutzen, inklusive und ohne Ausnahme, dem
-Recht, sie zu verwenden, kopieren, ändern, fusionieren, verlegen,
-verbreiten, unterlizenzieren und/oder zu verkaufen, und Personen, die diese
-Software erhalten, diese Rechte zu geben, unter den folgenden Bedingungen:
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
-Der obige Urheberrechtsvermerk und dieser Erlaubnisvermerk sind in allen
-Kopien oder Teilkopien der Software beizulegen.
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
-Die Software wird ohne jede ausdrückliche oder implizierte Garantie
-bereitgestellt, einschließlich der Garantie zur Benutzung für den
-vorgesehenen oder einen bestimmten Zweck sowie jeglicher Rechtsverletzung,
-jedoch nicht darauf beschränkt. In keinem Fall sind die Autoren oder
-Copyrightinhaber für jeglichen Schaden oder sonstige Ansprüche haftbar zu
-machen, ob infolge der Erfüllung eines Vertrages, eines Delikts oder anders
-im Zusammenhang mit der Software oder sonstiger Verwendung der Software
-entstanden.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import locale
