@@ -93,8 +93,6 @@ def index_paper(config, index, paper_id):
     result['modified'] = paper['modified']
   if 'originalId' in paper:
     result['originalId'] = paper['originalId']
-  if 'reference' in paper:
-    result['reference'] = paper['reference']
   if 'name' in paper:
     result['name'] = paper['name']
   if 'paperType' in paper:
@@ -141,7 +139,7 @@ if __name__ == '__main__':
   db = connection[sysconfig.MONGO_DBNAME]
   config = get_config(db)
   host = sysconfig.ES_HOST + ':' + str(sysconfig.ES_PORT)
-  es = Elasticsearch([sysconfig.ES_HOST+':'+str(sysconfig.ES_PORT)])
+  es = Elasticsearch([sysconfig.ES_HOST+':'+str(sysconfig.ES_PORT)], timeout=300)
 
   now = datetime.utcnow()
   new_index = config['es_paper_index'] + '-' + now.strftime('%Y%m%d-%H%M')
@@ -190,27 +188,27 @@ if __name__ == '__main__':
             'index': 'not_analyzed'
           },
           'file': {
-            'store': False,
-            'type': 'object'
-          },
-          'file.id': {
-            'store': True,
-            'type': 'string',
-            'index': 'analyzed'
-          },
-          'file.name': {
-            'store': True,
-            'type': 'string',
-            'index_name': 'fileName',
-            'index': 'analyzed',
-            'analyzer': 'my_simple_german_analyzer'
-          },
-          'file.fulltext': {
-            'store': True,
-            'type': 'string',
-            'index_name': 'fileFulltext',
-            'index': 'analyzed',
-            'analyzer': 'my_simple_german_analyzer'
+            'type': 'nested',
+            'include_in_parent': True, 
+            'properties': {
+              'id': {
+                'store': True,
+                'type': 'string',
+                'index': 'analyzed'
+              },
+              'name': {
+                'store': True,
+                'type': 'string',
+                'index': 'analyzed',
+                'analyzer': 'my_simple_german_analyzer'
+              },
+              'fulltext': {
+                'store': True,
+                'type': 'string',
+                'index': 'analyzed',
+                'analyzer': 'my_simple_german_analyzer'
+              },
+            }
           },
           'publishedDate': {
             'store': True,
@@ -275,3 +273,6 @@ if __name__ == '__main__':
     if new_index != single_index:
       print "Deleting index %s" % single_index
       es.indices.delete(single_index)
+  #print "refresh index"
+  #es.indices.refresh(new_index)
+  #es.indices.refresh(latest_name)

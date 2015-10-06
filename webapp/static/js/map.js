@@ -304,7 +304,7 @@ $(document).ready(function(){
   }
   
   /********** KEYWORD SEARCH **********/
-  
+  /*
   $('#qinput-submit').click(function(evt){
     evt.preventDefault();
     $('#search-form').trigger('submit');
@@ -332,6 +332,6 @@ $(document).ready(function(){
       else
         $('#address-live').css({'display': 'none'});
     }
-  });
+  });*/
   
 });

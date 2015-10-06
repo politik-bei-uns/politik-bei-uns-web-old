@@ -390,16 +390,17 @@ def query_paper(region=None, q='', fq=None, sort='score desc', start=0, papers_p
       }
     },
   }
-  
+
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
-    fields = 'name,paperType,publishedDate,bodyId,bodyName,externalId',
+    fields = 'name,paperType,publishedDate,bodyId,bodyName,externalId,file.fulltext',
     body = query,
     from_ = start,
     size = 10,
     sort = sort_field + ':' + sort_order
   )
+  
   ret = {
     'numhits': result['hits']['total'],
     'maxscore': result['hits']['max_score'],
@@ -538,6 +539,7 @@ def get_locations_by_name(location_string, region_id):
     },
     size = 10
   )
+  
   locations = []
   if result['hits']['total']:
     for location in result['hits']['hits']:
