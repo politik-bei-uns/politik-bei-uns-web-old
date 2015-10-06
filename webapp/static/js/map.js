@@ -304,12 +304,12 @@ $(document).ready(function(){
   }
   
   /********** KEYWORD SEARCH **********/
-  /*
+  
   $('#qinput-submit').click(function(evt){
     evt.preventDefault();
     $('#search-form').trigger('submit');
   });
-  
+  /*
   $('<p>').attr('id', 'qinput-live').css({'top': $('#qinput').height(), 'width': $('#qinput').width()}).appendTo($('#qinput-box'));
   
   $('#qinput').searchbox({
