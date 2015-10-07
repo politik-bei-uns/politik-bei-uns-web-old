@@ -68,8 +68,8 @@ def index_papers(config, index):
 
 
 def index_paper(config, index, paper_id):
-  print paper_id
   paper = db.paper.find_one(paper_id)
+  text_all = []
   # Body dereferenzieren
   paper['body'] = db.dereference(paper['body'])
   # Zugehörige files sammeln
@@ -96,6 +96,7 @@ def index_paper(config, index, paper_id):
     result['originalId'] = paper['originalId']
   if 'name' in paper:
     result['name'] = paper['name']
+    text_all.append(paper['name'])
   if 'paperType' in paper:
     result['paperType'] = paper['paperType']
   for file in files:
@@ -104,9 +105,13 @@ def index_paper(config, index, paper_id):
     }
     if 'fulltext' in file:
       result_file['fulltext'] = file['fulltext']
+      text_all.append(file['fulltext'])
     if 'name' in file:
       result_file['name'] = file['name']
+      text_all.append(file['name'])
     result['file'].append(result_file)
+  
+  result['text_all'] = ' '.join(text_all)
   es.index(index=index,
            doc_type='paper',
            id=str(paper_id),
@@ -225,10 +230,10 @@ if __name__ == '__main__':
             'type': 'string',
             'index': 'not_analyzed'
           },
-          'reference': {
-            'store': False,
+          'text_all': {
+            'store': True,
             'type': 'string',
-            'index': 'not_analyzed'
+            'index': 'analyzed'
           },
           'name': {
             'store': True,

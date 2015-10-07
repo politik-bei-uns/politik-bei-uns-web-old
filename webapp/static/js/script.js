@@ -361,7 +361,6 @@ var OpenRIS = {
         var $input = $(this)
         
         $input
-        .focus()
         .ajaxStart(function() { $.geosearchbox.start() })
         .ajaxStop(function() { $.geosearchbox.stop() })
         .keyup(function() {
@@ -440,7 +439,6 @@ var OpenRIS = {
         var $input = $(this)
         
         $input
-        .focus()
         .ajaxStart(function() { $.papersearchbox.start() })
         .ajaxStop(function() { $.papersearchbox.stop() })
         .keyup(function() {

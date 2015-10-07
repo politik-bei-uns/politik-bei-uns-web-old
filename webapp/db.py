@@ -485,27 +485,25 @@ def get_papers_live(search_string):
       'aggs': {
         'fragment': {
           'terms': {
-            'field': 'name',
-            'include': search_string + '.*',
-            'size': 0
+            'field': 'text_all',
+            'include': {
+              'pattern': search_string + '.*',
+              'flags': 'CANON_EQ|CASE_INSENSITIVE'
+            },
+            'size': 10
           }
         }
       }
     },
     size = 0
   )
-  print result
   search_results = []
-  if result['hits']['total']:
-    for search_result in result['hits']['hits']:
-      tmp_search_result = {
-        'name': search_result['fields']['name'][0],
-        'bodyName': search_result['fields']['bodyName'][0],
-        'point': search_result['fields']['point'][0]
-      }
-      if 'postalcode' in location['fields']:
-        tmp_search_result['postalcode'] = search_result['fields']['postalcode'][0]
-      search_results.append(tmp_search_result)
+  for search_result in result['aggregations']['fragment']['buckets']:
+    tmp_search_result = {
+      'name': search_result['key'].capitalize(),
+      'count' : search_result['doc_count']
+    }
+    search_results.append(tmp_search_result)
   return search_results
 
 def get_locations_by_name(location_string, region_id):

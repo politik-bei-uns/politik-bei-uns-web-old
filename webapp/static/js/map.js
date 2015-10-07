@@ -322,16 +322,56 @@ $(document).ready(function(){
       if (result.length) {
         $('#qinput-live').css({'display': 'block'});
         for (i = 0; i < result.length; i++) {
-          result_html += '<li data-point="' + result[i]['point'] + '\">' + result[i]['name'] + ', ';
-          if (result[i].hasOwnProperty('postalcode'))
-            result_html += result[i]['postalcode'] + ' ';
-          result_html += result[i]['bodyName'] + '</li>';
+          result_html += '<li data-q="' + result[i]['name'] + '\">' + result[i]['name'] + ' (' + result[i]['count'] + ')</li>';
         }
         result_html += '</ul>';
         $('#qinput-live').html(result_html);
+        $('#qinput-live li').click(function() {
+          search_string = $(this).attr('data-q');
+          $('#qinput').val(search_string);
+          $('#qinput-submit').trigger('click');
+        });
       }
       else
-        $('#address-live').css({'display': 'none'});
+        $('#qinput-live').css({'display': 'none'});
+    }
+  });
+  
+  
+  $('#qinput').keydown(function(evt){
+    // Enter abfangen
+    if (evt.keyCode == 13) {
+      evt.preventDefault();
+      if ($('#qinput-live li.highlighted').length) {
+        $('#qinput-live li.highlighted').trigger('click');
+      }
+      else
+        $('#qinput-submit').trigger('click');
+    }
+    // Pfeil hoch abfangen
+    if (evt.keyCode == 38) {
+      evt.preventDefault();
+      if ($('#qinput-live li.highlighted').length) {
+        before = $('#qinput-live li.highlighted').prev();
+        console.log(before);
+        if (before.length) {
+          $('#qinput-live li.highlighted').removeClass('highlighted');
+          before.addClass('highlighted');
+        }
+      }
+    }
+    // Pfeil runter abfangen
+    if (evt.keyCode == 40) {
+      evt.preventDefault();
+      if ($('#qinput-live li.highlighted').length) {
+        next = $('#qinput-live li.highlighted').next();
+        if (next.length) {
+          $('#qinput-live li.highlighted').removeClass('highlighted');
+          next.addClass('highlighted');
+        }
+      }
+      else
+        $('#qinput-live li').first().addClass('highlighted');
     }
   });
   
