@@ -67,7 +67,6 @@ class StreetCollector(object):
 def run(city_id):
   tmp_base_path = '/srv/www/ris-web/temp/osm-import/'
   reuse_old_data = False
-  print app.config['bodies']
   if not reuse_old_data:
     # remove old data
     if os.path.exists(tmp_base_path):

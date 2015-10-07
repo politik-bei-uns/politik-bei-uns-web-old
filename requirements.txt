@@ -22,3 +22,5 @@ imposm.parser
 python-memcached
 pillow
 git+git://github.com/werner2101/python-osm.git
+Flask-Elasticsearch
+Flask-Script

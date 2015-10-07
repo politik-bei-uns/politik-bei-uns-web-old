@@ -67,10 +67,10 @@ $(document).ready(function(){
     handleLocationInput();
   }
   
-  OpenRIS.loadLiveSearch();
+  OpenRIS.loadGeoLiveSearch();
   $('<p>').attr('id', 'address-live').css({'top': $('#address').height(), 'width': $('#address').width()}).appendTo($('#address-box'));
   
-  $('#address').searchbox({
+  $('#address').geosearchbox({
     'url': '/api/locations',
     'param': 'l',
     'show_results': function(result) {
@@ -309,12 +309,13 @@ $(document).ready(function(){
     evt.preventDefault();
     $('#search-form').trigger('submit');
   });
-  /*
+  
+  OpenRIS.loadPaperLiveSearch();
   $('<p>').attr('id', 'qinput-live').css({'top': $('#qinput').height(), 'width': $('#qinput').width()}).appendTo($('#qinput-box'));
   
-  $('#qinput').searchbox({
+  $('#qinput').papersearchbox({
     'url': '/api/papers-live',
-    'param': 'l',
+    'param': 'p',
     'show_results': function(result) {
       result = result['response'];
       result_html = '<ul>';
@@ -332,6 +333,6 @@ $(document).ready(function(){
       else
         $('#address-live').css({'display': 'none'});
     }
-  });*/
+  });
   
 });

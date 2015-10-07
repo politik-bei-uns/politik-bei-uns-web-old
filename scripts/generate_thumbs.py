@@ -81,7 +81,6 @@ def generate_thumbs(db, config, body_id):
     'depublication': {'$exists': False},
     'body': DBRef('body', ObjectId(body_id))
   }
-  print "weeeeeee"
   for single_file in db.file.find(query, timeout=False):
     # Dateiinfo abholen
     if single_file['modified'] > single_file['thumbnailsGenerated']:
@@ -95,11 +94,12 @@ def generate_thumbs(db, config, body_id):
     'body': DBRef('body', ObjectId(body_id))
   }
   for single_file in db.file.find(query, timeout=False):
-    if get_file_suffix(single_file['filename']) in config['thumbs_valid_types']:
-      STATS['attachments_without_thumbs'] += 1
-      generate_thumbs_for_file(db, config, body_id, single_file['_id'])
-  #generate_thumbs_for_file(db, config, body_id, ObjectId('55d0982a9bcda406cc9cdcfd'))
-  generate_thumbs_for_file(db, config, body_id, ObjectId('55d0982a9bcda406cc9cdd00'))
+    if 'file' not in single_file:
+      print "FATAL! missing file"
+    else:
+      if get_file_suffix(single_file['filename']) in config['thumbs_valid_types']:
+        STATS['attachments_without_thumbs'] += 1
+        generate_thumbs_for_file(db, config, body_id, single_file['_id'])
 
 
 def get_file_suffix(filename):
@@ -125,8 +125,9 @@ def generate_thumbs_for_file(db, config, body_id, file_id):
   
   # mimetype check
   run_convert = False
-  if single_file['mimetype'] in ['application/pdf', 'application/msword']:
-    run_convert = True
+  if 'mimetype' in single_file:
+    if single_file['mimetype'] in ['application/pdf', 'application/msword']:
+      run_convert = True
   
   if run_convert:
     file_data = fs.get(single_file['file'].id)

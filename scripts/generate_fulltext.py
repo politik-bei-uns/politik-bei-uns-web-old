@@ -97,39 +97,42 @@ def generate_fulltext_for_file(db, config, single_file):
   """
   # temporaere Datei des Attachments anlegen
   print "Processing file_id=%s" % (single_file['_id'])
-  path = store_tempfile(single_file['_id'], db)
-  
-  if single_file['mimetype'] == 'application/pdf':
-    cmd = config['pdf_to_text_cmd'] + ' -nopgbrk -enc UTF-8 ' + path + ' -'
-  elif single_file['mimetype'] == 'application/msword':
-    cmd = config['abiword_cmd'] + ' --to=txt --to-name=fd://1 ' + path
+  if 'file' not in single_file:
+    print "Fatal Error: file missing in file object"
   else:
-    cmd = None
-    STATS['wrong_mimetype'] += 1
-  
-  if cmd:
-    text = execute(cmd)
-    if text is not None:
-      text = text.strip()
-      text = text.decode('utf-8')
-      text = text.replace(u"\u00a0", " ")
-
-  # delete temp file
-  os.unlink(path)
-  now = datetime.datetime.utcnow()
-  update = {
-    '$set': {
-      'fulltextGenerated': now,
-      'modified': now
-    }
-  }
-  if cmd:
-    if text is None or text == '':
-      STATS['fulltext_not_created'] += 1
+    path = store_tempfile(single_file['_id'], db)
+    
+    if single_file['mimetype'] == 'application/pdf':
+      cmd = config['pdf_to_text_cmd'] + ' -nopgbrk -enc UTF-8 ' + path + ' -'
+    elif single_file['mimetype'] == 'application/msword':
+      cmd = config['abiword_cmd'] + ' --to=txt --to-name=fd://1 ' + path
     else:
-      update['$set']['fulltext'] = text
-      STATS['fulltext_created'] += 1
-    db.file.update({'_id': single_file['_id']}, update)
+      cmd = None
+      STATS['wrong_mimetype'] += 1
+    
+    if cmd:
+      text = execute(cmd)
+      if text is not None:
+        text = text.strip()
+        text = text.decode('utf-8')
+        text = text.replace(u"\u00a0", " ")
+  
+    # delete temp file
+    os.unlink(path)
+    now = datetime.datetime.utcnow()
+    update = {
+      '$set': {
+        'fulltextGenerated': now,
+        'modified': now
+      }
+    }
+    if cmd:
+      if text is None or text == '':
+        STATS['fulltext_not_created'] += 1
+      else:
+        update['$set']['fulltext'] = text
+        STATS['fulltext_created'] += 1
+      db.file.update({'_id': single_file['_id']}, update)
 
 
 def execute(cmd):

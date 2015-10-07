@@ -472,28 +472,29 @@ def query_paper_num(region_id, q):
     }
 
 def get_papers_live(search_string):
-  query_parts = []
-  for search_string in search_string.replace(',', '').split():
-    query_parts.append({
-              'multi_match': {
-                'fields': ['file.fulltext', 'file.name', 'name'],
-                'type': 'phrase_prefix',
-                'query': search_string
-              }
-            })
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
     fields = 'name',
     body = {
       'query': {
-        'bool': {
-          'must': query_parts
+        'match_phrase_prefix': {
+          'name': search_string
+        }
+      },
+      'aggs': {
+        'fragment': {
+          'terms': {
+            'field': 'name',
+            'include': search_string + '.*',
+            'size': 0
+          }
         }
       }
     },
-    size = 10
+    size = 0
   )
+  print result
   search_results = []
   if result['hits']['total']:
     for search_result in result['hits']['hits']:

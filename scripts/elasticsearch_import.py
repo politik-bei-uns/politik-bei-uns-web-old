@@ -68,6 +68,7 @@ def index_papers(config, index):
 
 
 def index_paper(config, index, paper_id):
+  print paper_id
   paper = db.paper.find_one(paper_id)
   # Body dereferenzieren
   paper['body'] = db.dereference(paper['body'])
@@ -273,6 +274,3 @@ if __name__ == '__main__':
     if new_index != single_index:
       print "Deleting index %s" % single_index
       es.indices.delete(single_index)
-  #print "refresh index"
-  #es.indices.refresh(new_index)
-  #es.indices.refresh(latest_name)
