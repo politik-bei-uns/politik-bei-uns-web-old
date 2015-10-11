@@ -46,6 +46,11 @@ class RegionForm(Form):
     validators=[validators.Required(), validators.NumberRange(min=1, max=2)],
     description='',
     default=0)
+  active = IntegerField(
+    label=u'Ist die Region aktiv?',
+    validators=[validators.NumberRange(min=0, max=1)],
+    description='',
+    default=0)
   bodies = TextAreaField(
     label=u'Bodies, pro Zeile eine ID',
     validators=[validators.Required(), validators.Length(max=32000)],

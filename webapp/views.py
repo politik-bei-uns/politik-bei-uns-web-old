@@ -375,6 +375,7 @@ def admin_region_edit():
         bodies.append(str(body.id))
       region_form = RegionForm(name = config[0]['name'],
                                type = int(config[0]['type']) if 'type' in config[0] else 0,
+                               active = int(config[0]['active']) if 'active' in config[0] else 0,
                                lat = config[0]['lat'] if 'lat' in config[0] else 0.0,
                                lon = config[0]['lon'] if 'lon' in config[0] else 0.0,
                                zoom = config[0]['zoom'] if 'zoom' in config[0] else 0.0,
@@ -390,6 +391,7 @@ def admin_region_edit():
       save_region_bodies.append(DBRef('body', current_body))
     mongo.db.region.update({'_id': ObjectId(request.args.get('id'))}, {'name': region_form.name.data,
                                                                        'type': region_form.type.data,
+                                                                       'active': region_form.active.data,
                                                                        'lat': region_form.lat.data,
                                                                        'lon': region_form.lon.data,
                                                                        'zoom': region_form.zoom.data,

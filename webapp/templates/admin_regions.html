@@ -12,6 +12,7 @@
 			<tr>
 				<th>UID</th>
 				<th>Name</th>
+				<th>Aktiv</th>
 				<th>Funktionen</th>
 			</tr>
 		</thead>
@@ -19,6 +20,7 @@
 			<tr>
 				<th>UID</th>
 				<th>Name</th>
+				<th>Aktiv</th>
 				<th>Funktionen</th>
 			</tr>
 		</tfoot>
@@ -27,6 +29,7 @@
 			<tr>
 				<th>{{ region._id }}</th>
 				<td>{{ region.name }}</td>
+				<td>{{ region.active }}</td>
 				<td><a href="/admin/region/edit?id={{ region._id }}">edit</a></td>
 			</tr>
 			{% endfor %}

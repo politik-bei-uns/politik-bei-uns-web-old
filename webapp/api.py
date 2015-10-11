@@ -202,7 +202,7 @@ def api_streets():
 def api_regions():
   jsonp_callback = request.args.get('callback', None)
   result = []
-  regions=mongo.db.region.find().sort([('name', 1)])
+  regions=mongo.db.region.find({ 'active': 1 }).sort([('name', 1)])
   for region in regions:
     result.append({'id': region['_id'],
                    'type': region['type'],
