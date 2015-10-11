@@ -115,7 +115,18 @@ def daten():
         'name': body_dict[file.split('.')[0]],
         'size': "%d" % (stat.st_size / 1024.0 / 1024.0 / 1024.0)
       })
-  return render_template('daten.html', data_list=data_list, file_list=file_list)
+  statistics = []
+  for body_id, body in app.config['bodies'].iteritems():
+    statistics.append({
+      'name': body['name'],
+      'organization': db.get_organization_count({'body': DBRef('body', ObjectId(body_id))}),
+      'person': db.get_person_count({'body': DBRef('body', ObjectId(body_id))}),
+      'meeting': db.get_meeting_count({'body': DBRef('body', ObjectId(body_id))}),
+      'agendaItem': db.get_agendaItem_count({'body': DBRef('body', ObjectId(body_id))}),
+      'paper': db.get_paper_count({'body': DBRef('body', ObjectId(body_id))}),
+      'file': db.get_file_count({'body': DBRef('body', ObjectId(body_id))})
+    })
+  return render_template('daten.html', data_list=data_list, file_list=file_list, statistics=statistics)
 
 
 @app.route("/disclaimer")

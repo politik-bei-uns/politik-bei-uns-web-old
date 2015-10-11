@@ -63,7 +63,7 @@
 		</table>
 	</div>
 </div>
-<div class="content bottom">
+<div class="content middle">
 	<div class="text">
 		<h2>Anlagen/Dateien zu Dokumenten</h2>
 		
@@ -85,6 +85,40 @@
 					<td>{{ item['name'] }}</td>
 					<td>{{ item['size'] }} GB</td>
 					<td><a href="/static/dateien/{{ item['id'] }}.tar.bz2">download</a></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+<div class="content bottom">
+	<div class="text">
+		<h2>Statistiken</h2>
+		
+		<p>Wie viele Dokumente befinden sich auf {{ config.site_host }}? Hier ein paar Statistiken.</p>
+		
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Stadt</th>
+					<th>Organisationen</th>
+					<th>Personen</th>
+					<th>Sitzungen</th>
+					<th>Tagesordnungspunkte</th>
+					<th>Vorlagen</th>
+					<th>Dateien</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in statistics %}
+				<tr>
+					<td>{{ item['name'] }}</td>
+					<td>{{ item['organization'] }}</td>
+					<td>{{ item['person'] }}</td>
+					<td>{{ item['meeting'] }}</td>
+					<td>{{ item['agendaItem'] }}</td>
+					<td>{{ item['paper'] }}</td>
+					<td>{{ item['file'] }}</td>
 				</tr>
 				{% endfor %}
 			</tbody>

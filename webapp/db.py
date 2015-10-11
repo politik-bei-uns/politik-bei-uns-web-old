@@ -115,12 +115,17 @@ def get_meeting(add_prefix='', add_postfix='', search_params={}, deref={}, sort=
 def get_meeting_count(search_params={}):
   return mongo.db.meeting.find(search_params).count()
 
+
 # agendaItem
 def get_agendaItem(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
   for agendaitem in mongo.db.agendaitem.find(search_params).sort(sort[0], sort[1]).limit(limit):
     result.append(agendaitem)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
+
+def get_agendaItem_count(search_params={}):
+  return mongo.db.agendaitem.find(search_params).count()
+
 
 # consultation
 def get_consultation(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
@@ -147,6 +152,9 @@ def get_file(add_prefix='', add_postfix='', search_params={}, deref={}):
   for file in mongo.db.file.find(search_params):
     result.append(file)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
+
+def get_file_count(search_params={}):
+  return mongo.db.file.find(search_params).count()
 
 
 def get_file_data(file_id):
