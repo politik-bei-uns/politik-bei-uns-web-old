@@ -116,15 +116,15 @@ def daten():
         'size': "%d" % (stat.st_size / 1024.0 / 1024.0 / 1024.0)
       })
   statistics = []
-  for body_id, body in app.config['bodies'].iteritems():
+  for body in db.get_body(sort=['name', 1]):
     statistics.append({
       'name': body['name'],
-      'organization': db.get_organization_count({'body': DBRef('body', ObjectId(body_id))}),
-      'person': db.get_person_count({'body': DBRef('body', ObjectId(body_id))}),
-      'meeting': db.get_meeting_count({'body': DBRef('body', ObjectId(body_id))}),
-      'agendaItem': db.get_agendaItem_count({'body': DBRef('body', ObjectId(body_id))}),
-      'paper': db.get_paper_count({'body': DBRef('body', ObjectId(body_id))}),
-      'file': db.get_file_count({'body': DBRef('body', ObjectId(body_id))})
+      'organization': db.get_organization_count({'body': DBRef('body', body['_id'])}),
+      'person': db.get_person_count({'body': DBRef('body', body['_id'])}),
+      'meeting': db.get_meeting_count({'body': DBRef('body', body['_id'])}),
+      'agendaItem': db.get_agendaItem_count({'body': DBRef('body', body['_id'])}),
+      'paper': db.get_paper_count({'body': DBRef('body', body['_id'])}),
+      'file': db.get_file_count({'body': DBRef('body', body['_id'])})
     })
   statistics_all = {
       'organization': db.get_organization_count(),
