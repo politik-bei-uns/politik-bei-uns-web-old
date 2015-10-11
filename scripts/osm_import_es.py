@@ -154,38 +154,24 @@ def run():
   # z.B. 'location-20130414-1200' -> 'location-latest'
   latest_name = app.config['es_location_index'] + '-latest'
   latest_before = es.indices.get_alias(latest_name)
-  if len(latest_before):
-    latest_before, tmp = latest_before.popitem()
-    alias_update = {
-      'actions': [
-        {
-          'remove': {
-            'index': latest_before,
-            'alias': latest_name
-          }
-        },
-        {
-          'add': {
-            'index': new_index,
-            'alias': latest_name
-          }
-        }
-      ]
-    }
-  else:
-    alias_update = {
-      'actions': [
-        {
-          'add': {
-            'index': new_index,
-            'alias': latest_name
-          }
-        }
-      ]
-    }
+  alias_update = []
+  for single_before in latest_before:
+    alias_update.append({
+                          'remove': {
+                            'index': single_before,
+                            'alias': latest_name
+                          }
+                        })
+  alias_update.append({
+                        'add': {
+                          'index': new_index,
+                          'alias': latest_name
+                        }
+                      })
   print "Aliasing index %s to '%s'" % (new_index, latest_name)
-  es.indices.update_aliases(body=alias_update)
-  print "Deleting index %s" % latest_before
-  es.indices.delete(latest_before)
-  print "Refresh index"
-  es.indices.refresh(new_index)
+  es.indices.update_aliases({ 'actions': alias_update })
+  index_before = es.indices.get('%s*' % app.config['es_location_index'])
+  for single_index in index_before:
+    if new_index != single_index:
+      print "Deleting index %s" % single_index
+      es.indices.delete(single_index)

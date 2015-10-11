@@ -322,7 +322,8 @@ $(document).ready(function(){
       if (result.length) {
         $('#qinput-live').css({'display': 'block'});
         for (i = 0; i < result.length; i++) {
-          result_html += '<li data-q="' + result[i]['name'] + '\">' + result[i]['name'] + ' (' + result[i]['count'] + ')</li>';
+          result_html += '<li data-q="' + result[i]['name'] + '\">' + result[i]['name'] + '</li>';
+          // TODO: Suchergebnis-Counter präzisieren, dann /*' (' + result[i]['count'] + ')*/ hinzufügen
         }
         result_html += '</ul>';
         $('#qinput-live').html(result_html);
