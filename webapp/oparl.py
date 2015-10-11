@@ -875,7 +875,7 @@ def oparl_file_paper_data(params):
 """
 
 # file accessUrl
-@app.route('/oparl/file/<string:file_id>/accessUrl')
+@app.route('/oparl/file/<string:file_id>/access')
 def oparl_file_accessUrl(file_id):
   return oparl_basic(oparl_file_accessUrl_data, params={'file_id': file_id}, direct_output=True)
 
@@ -924,7 +924,7 @@ def oparl_file_accessUrl_data(params):
 
 
 # file downloadUrl
-@app.route('/oparl/file/<string:file_id>/downloadUrl')
+@app.route('/oparl/file/<string:file_id>/download')
 def oparl_file_downloadUrl(file_id):
   return oparl_basic(oparl_file_downloadUrl_data, params={'file_id': file_id}, direct_output=True)
 
