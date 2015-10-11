@@ -38,7 +38,7 @@ from flask import session
 from flask.ext.basicauth import BasicAuth
 from flask.ext.pymongo import PyMongo
 
-from webapp import app, mongo, basic_auth
+from webapp import app, mongo, basic_auth, cache
 from forms import *
 from oparl import oparl_file_accessUrl
 
@@ -72,22 +72,27 @@ def api_home():
 
 
 @app.route("/hilfe")
+@cache.cached(timeout=14400)
 def hilfe():
   return render_template('hilfe.html')
 
 @app.route("/ueber")
+@cache.cached(timeout=14400)
 def ueber():
   return render_template('ueber.html')
 
 @app.route("/impressum")
+@cache.cached(timeout=14400)
 def impressum():
   return render_template('impressum.html')
 
 @app.route("/datenschutz")
+@cache.cached(timeout=14400)
 def datenschutz():
   return render_template('datenschutz.html')
 
 @app.route("/daten")
+@cache.cached(timeout=14400)
 def daten():
   """
   Anzeige der /daten Seite mit Auflistung der
@@ -138,6 +143,7 @@ def daten():
 
 
 @app.route("/disclaimer")
+@cache.cached(timeout=14400)
 def disclaimer():
   return render_template('disclaimer.html')
 
@@ -147,6 +153,7 @@ def favicon():
   return ""
 
 @app.route("/robots.txt")
+@cache.cached(timeout=14400)
 def robots_txt():
   return render_template('robots.txt')
 
@@ -292,6 +299,7 @@ def suche_feed():
   return response
 
 @app.route("/paper/<string:id>")
+@cache.memoize(timeout=14400)
 def view_paper(id):
   """
   Gibt Dokumenten-Detailseite aus
