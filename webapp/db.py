@@ -26,6 +26,7 @@ from flask import abort
 from bson import ObjectId, DBRef
 from webapp import app, mongo, es
 from flask.ext.pymongo import PyMongo
+from pymongo import ASCENDING, DESCENDING
 
 def get_config(body_uid=False):
   """
@@ -56,146 +57,95 @@ def merge_dict(self, x, y):
       merged[key] = merge_dict(x[key],y[key])
   return merged
 
-def get_body(body_list=False, add_prefix='', add_postfix='', search_params={}):
+def get_body(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  if body_list:
-    for body in mongo.db.body.find(search_params,{'_id':1}):
-      result.append("%s%s%s" % (add_prefix, body['_id'], add_postfix))
-  else:
-    for body in mongo.db.body.find(search_params):
-      result.append(body)
-  return result
+  for body in mongo.db.body.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(body)
+  return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_legislativeTerm(legislativeTerm_list=False, add_prefix='', add_postfix='', search_params={}, deref={}):
+def get_body_count(search_params={}):
+  return mongo.db.body.find(search_params).count()
+
+
+# legislativeTerm
+def get_legislativeTerm(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  if legislativeTerm_list:
-    for legislativeTerm in mongo.db.legislativeTerm.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(legislativeTerm['_id']) + add_postfix)
-  else:
-    for legislativeTerm in mongo.db.legislativeTerm.find(search_params):
-      result.append(legislativeTerm)
+  for legislativeTerm in mongo.db.legislativeTerm.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(legislativeTerm)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
 
-def get_organization(organization_list=False, add_prefix='', add_postfix='', search_params={}, deref={}):
+# organization
+def get_organization(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  #search_params = dereference_search_params(search_params, [
-  #  {'from': 'body_id', 'to': 'body', 'field': '_id', 'get_function': get_body},
-  #  {'from': 'person_id', 'to': 'person', 'field': '_id', 'get_function': get_person}
-  #])
-  if organization_list:
-    for organization in mongo.db.organization.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(organization['_id']) + add_postfix)
-  else:
-    for organization in mongo.db.organization.find(search_params):
-      result.append(organization)
+  for organization in mongo.db.organization.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(organization)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_membership(membership_list=False, add_prefix='', add_postfix='', search_params={}, deref={}):
+def get_organization_count(search_params={}):
+  return mongo.db.organization.find(search_params).count()
+
+
+# membership
+def get_membership(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  if membership_list:
-    for membership in mongo.db.membership.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(membership['_id']) + add_postfix)
-  else:
-    for membership in mongo.db.membership.find(search_params):
-      result.append(membership)
+  for membership in mongo.db.membership.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(membership)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_person(person_list=False, add_prefix='', add_postfix='', search_params={}, deref={}, values={}):
+
+# person
+def get_person(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  #search_params = dereference_search_params(search_params, [
-  #  {'from': 'body_slug', 'to': 'body', 'field': 'title', 'get_function': get_body},
-  #  {'from': 'committee_slug', 'to': 'committee', 'field': 'slug', 'get_function': get_committee}
-  #])
-  if person_list:
-    for person in mongo.db.person.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(person['_id']) + add_postfix)
-  else:
-    if len(values):
-      for person in mongo.db.person.find(search_params, values):
-        result.append(person)
-    else:
-      for person in mongo.db.person.find(search_params):
-        result.append(person)
+  for person in mongo.db.person.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(person)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_meeting(meeting_list=False, add_prefix='', add_postfix='', search_params={}, deref={}, values={}):
+def get_person_count(search_params={}):
+  return mongo.db.person.find(search_params).count()
+
+
+# meeting
+def get_meeting(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  #search_params = dereference_search_params(search_params, [
-  #  {'from': 'body_slug', 'to': 'body', 'field': 'title', 'get_function': get_body},
-  #  {'from': 'committee_slug', 'to': 'committee', 'field': 'slug', 'get_function': get_committee},
-  #  {'from': 'agendaitem_slug', 'to': 'agendaitem', 'field': 'slug', 'get_function': get_agendaitem},
-  #  {'from': 'document_slug', 'to': 'document', 'field': 'slug', 'get_function': get_document}
-  #])
-  if meeting_list:
-    for meeting in mongo.db.meeting.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(meeting['_id']) + add_postfix)
-  else:
-    if len(values):
-      for meeting in mongo.db.meeting.find(search_params, values):
-        result.append(meeting)
-    else:
-      for meeting in mongo.db.meeting.find(search_params):
-        result.append(meeting)
+  for meeting in mongo.db.meeting.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(meeting)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_agendaItem(agendaItem_list=False, add_prefix='', add_postfix='', search_params={}, deref={}, values={}):
+def get_meeting_count(search_params={}):
+  return mongo.db.meeting.find(search_params).count()
+
+# agendaItem
+def get_agendaItem(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  #search_params = dereference_search_params(search_params, [
-  #  {'from': 'body_slug', 'to': 'body', 'field': 'title', 'get_function': get_body},
-  #  {'from': 'paper_slug', 'to': 'paper', 'field': 'slug', 'get_function': get_paper}
-  #])
-  if agendaItem_list:
-    for agendaitem in mongo.db.agendaitem.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(agendaitem['_id']) + add_postfix)
-  else:
-    if len(values):
-      for agendaitem in mongo.db.agendaitem.find(search_params, values):
-        result.append(agendaitem)
-    else:
-      for agendaitem in mongo.db.agendaitem.find(search_params):
-        result.append(agendaitem)
+  for agendaitem in mongo.db.agendaitem.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(agendaitem)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_consultation(consultation_list=False, add_prefix='', add_postfix='', search_params={}, deref={}):
+# consultation
+def get_consultation(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  #search_params = dereference_search_params(search_params, [
-  #  {'from': 'body_slug', 'to': 'body', 'field': 'title', 'get_function': get_body},
-  #  {'from': 'document_slug', 'to': 'document', 'field': 'slug', 'get_function': get_document}
-  #])
-  if consultation_list:
-    for consultation in mongo.db.consultation.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(consultation['_id']) + add_postfix)
-  else:
-    for consultation in mongo.db.consultation.find(search_params):
-      result.append(consultation)
+  for consultation in mongo.db.consultation.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(consultation)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_paper(paper_list=False, add_prefix='', add_postfix='', search_params={}, deref={}):
+
+# paper
+def get_paper(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  #search_params = dereference_search_params(search_params, [
-  #  {'from': 'body_slug', 'to': 'body', 'field': 'title', 'get_function': get_body},
-  #  {'from': 'document_slug', 'to': 'document', 'field': 'slug', 'get_function': get_document}
-  #])
-  if paper_list:
-    for paper in mongo.db.paper.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(paper['_id']) + add_postfix)
-  else:
-    for paper in mongo.db.paper.find(search_params):
-      result.append(paper)
+  for paper in mongo.db.paper.find(search_params).sort(sort[0], sort[1]).limit(limit):
+    result.append(paper)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
-def get_file(file_list=False, add_prefix='', add_postfix='', search_params={}, deref={}):
+def get_paper_count(search_params={}):
+  return mongo.db.paper.find(search_params).count()
+
+
+# file
+def get_file(add_prefix='', add_postfix='', search_params={}, deref={}):
   result = []
-  #search_params = dereference_search_params(search_params, [
-  #  {'from': 'body_slug', 'to': 'body', 'field': 'title', 'get_function': get_body}
-  #])
-  if file_list:
-    for file in mongo.db.file.find(search_params,{'_id':1}):
-      result.append(add_prefix + str(file['_id']) + add_postfix)
-  else:
-    for file in mongo.db.file.find(search_params):
-      result.append(file)
+  for file in mongo.db.file.find(search_params):
+    result.append(file)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
 
@@ -243,12 +193,13 @@ def dereference_result_items(result, deref, add_prefix, add_postfix):
   # dereference values in dict
   elif 'values' in deref:
     for value in deref['values']:
-      if value in result[0]:
-        if isinstance(result[0][value], DBRef):
-          result[0][value] = mongo.db.dereference(result[0][value])
-        else:
-          for item_id in range(len(result[0][value])):
-            result[0][value][item_id] = mongo.db.dereference(result[0][value][item_id])
+      for result_key, result_value in enumerate(result):
+        if value in result[result_key]:
+          if isinstance(result[result_key][value], DBRef):
+            result[result_key][value] = mongo.db.dereference(result[result_key][value])
+          else:
+            for item_id in range(len(result[result_key][value])):
+              result[result_key][value][item_id] = mongo.db.dereference(result[result_key][value][item_id])
     return result
   # do nothing
   else:
@@ -472,22 +423,46 @@ def query_paper_num(region_id, q):
     }
 
 def get_papers_live(search_string):
+  search_string = search_string.split()
+  if not len(search_string):
+    return []
+  search_string_to_complete = search_string[-1]
+  
+  search_string_to_complete_must = [{ 
+    'match_phrase_prefix': {
+      'name': search_string_to_complete
+    }
+  }]
+  single_string_full_must = []
+  if len(search_string[0:-1]):
+    simple_query = [{
+      'query_string': {
+        'fields': ['text_all'],
+        'query': " ".join(search_string[0:-1]),
+        'default_operator': 'and'
+      }
+    }]
+  else:
+    simple_query = []
+  
+  
+  
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
     fields = 'name',
     body = {
-      'query': {
-        'match_phrase_prefix': {
-          'name': search_string
-        }
-      },
+      #'query': {
+      #  'bool': {
+      #    'must': simple_query + search_string_to_complete_must
+      #  }
+      #},
       'aggs': {
         'fragment': {
           'terms': {
             'field': 'text_all',
             'include': {
-              'pattern': search_string + '.*',
+              'pattern': search_string_to_complete + '.*',
               'flags': 'CANON_EQ|CASE_INSENSITIVE'
             },
             'size': 10
@@ -497,10 +472,14 @@ def get_papers_live(search_string):
     },
     size = 0
   )
+  print result
   search_results = []
+  prefix = ""
+  if len(search_string[0:-1]):
+    prefix = " ".join(search_string[0:-1]) + " "
   for search_result in result['aggregations']['fragment']['buckets']:
     tmp_search_result = {
-      'name': search_result['key'].capitalize(),
+      'name': prefix + search_result['key'].capitalize(),
       'count' : search_result['doc_count']
     }
     search_results.append(tmp_search_result)

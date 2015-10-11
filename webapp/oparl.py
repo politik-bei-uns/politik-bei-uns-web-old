@@ -51,34 +51,16 @@ def oparl_general():
     "oparlVersion": "http://oparl.org/specs/1.0/",
     "name": "OKF-DE OParl Service",
     "body": "%s/oparl/body%s" % (app.config['api_url'], generate_postfix(params)),
-    "contactEmail": "ernesto.ruge@okfn.de",
+    "contactEmail": "kontakt@politik-bei-uns.de",
     "contactName": "Ernesto Ruge, Open Knowledge Foundation Deutschland e.V.",
-    "websire": "http://politik-bei-uns.de/",
-    "product": "http://politik-bei-uns.de/",
-    "vendor": "http://politik-bei-uns.de/"
+    "website": "http://politik-bei-uns.de/",
+    "vendor": "http://politik-bei-uns.de/",
+    "product": "http://politik-bei-uns.de/"
   })
 
 ####################################################
 # body
 ####################################################
-
-# process data
-def oparl_body_process_dataset(data, params):
-  data['legislativeTerm'] = generate_sublist_url(params=params, main_type='body', sublist_type='legislativeTerm')
-  data['organization'] = generate_sublist_url(params=params, main_type='body', sublist_type='organization')
-  data['membership'] = generate_sublist_url(params=params, main_type='body', sublist_type='membership')
-  data['person'] = generate_sublist_url(params=params, main_type='body', sublist_type='person')
-  data['meeting'] = generate_sublist_url(params=params, main_type='body', sublist_type='meeting')
-  data['agendaItem'] = generate_sublist_url(params=params, main_type='body', sublist_type='agendaItem')
-  data['paper'] = generate_sublist_url(params=params, main_type='body', sublist_type='paper')
-  data['consultation'] = generate_sublist_url(params=params, main_type='body', sublist_type='consultation')
-  data['file'] = generate_sublist_url(params=params, main_type='body', sublist_type='file')
-  data['system'] = "%s/oparl%s" % (app.config['api_url'], generate_postfix(params))
-  data['type'] = 'http://oparl.org/schema/1.0/Body'
-  data['id'] = generate_single_url(type='body', id=data['_id'], params=params)
-  del data['config']
-  del data['_id']
-  return data
 
 # body list
 @app.route('/oparl/body')
@@ -86,9 +68,31 @@ def oparl_bodies():
   return oparl_basic(oparl_bodies_data)
 
 def oparl_bodies_data(params):
-  return db.get_body(body_list = True,
-                     add_prefix = "%s/oparl/body/" % app.config['api_url'],
+  return db.get_body(add_prefix = "%s/oparl/body/" % app.config['api_url'],
                      add_postfix=generate_postfix(params))
+
+def oparl_bodies_data(params):
+  search_params = {}
+  if 'q' in params:
+    search_params['modified'] = { '$lt': datetime.datetime.strptime(params['q'].split(':<')[1], "%Y-%m-%dT%H:%M:%S.%f") }
+
+  # TODO: working pagination, fails because of modified value = string insead of datetime
+  data = db.get_body(search_params = search_params, limit=1000)
+  result_count = db.get_body_count(search_params=search_params)
+  data = {
+    'items': data,
+    'itemsPerPage': 1000
+  }
+  if result_count > 1000:
+    data['nextPage'] = '%s/oparl/body%s' % (app.config['api_url'], generate_postfix(params, ['q=modified:<%s' % data['items'][9]['modified'].strftime("%Y-%m-%dT%H:%M:%S.%f")]))
+  if 'modified' in search_params:
+    data['firstPage'] = '%s/oparl/body%s' % (app.config['api_url'], generate_postfix(params))
+
+  for key, single in enumerate(data['items']):
+    print single
+    data['items'][key] = oparl_body_layout(data=single, params=params)
+  return data
+
 
 # single body
 @app.route('/oparl/body/<string:body_id>')
@@ -98,21 +102,28 @@ def oparl_body(body_id):
 def oparl_body_data(params):
   data = db.get_body(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    return oparl_body_process_dataset(data=data[0], params=params)
+    return oparl_body_layout(data=data[0], params=params)
   elif len(data) == 0:
     abort(404)
 
-# body legislativeTerm list
-@app.route('/oparl/body/<string:body_id>/legislativeTerm')
-def oparl_body_legislativeTerm(body_id):
-  return oparl_basic(oparl_body_legislativeTerm_data,
-                     params={'body_id':body_id})
-
-def oparl_body_legislativeTerm_data(params):
-  data = db.get_legislativeTerm(legislativeTerm_list = True,
-                             search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                             add_prefix = "%s/oparl/legislativeTerm/" % app.config['api_url'],
-                             add_postfix = generate_postfix(params))
+def oparl_body_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'https://oparl.org/schema/1.0/Body'
+  #data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  #data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  data['system'] = "%s/oparl%s" % (app.config['api_url'], generate_postfix(params))
+  data['organization'] = "%s/oparl/body/%s/organization%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['person'] = "%s/oparl/body/%s/person%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['meeting'] = "%s/oparl/body/%s/meeting%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['paper'] = "%s/oparl/body/%s/paper%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  
+  
+  # delete stuff
+  del data['config']
+  del data['_id']
   return data
 
 # body organization list
@@ -122,24 +133,17 @@ def oparl_body_organization(body_id):
                      params={'body_id':body_id})
 
 def oparl_body_organization_data(params):
-  data = db.get_organization(organization_list = True,
-                             search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                             add_prefix = "%s/oparl/organization/" % app.config['api_url'],
-                             add_postfix = generate_postfix(params))
+  search_params = oparl_generate_list_search_params(params)
+  data = db.get_organization(search_params = search_params, limit=app.config['oparl_items_per_page'])
+  data = oparl_generate_list_items(params=params,
+                                   search_params=search_params,
+                                   result_count=db.get_organization_count(search_params=search_params),
+                                   data=data,
+                                   type='organization')
+  for key, single in enumerate(data['items']):
+    data['items'][key] = oparl_organization_layout(data=single, params=params)
   return data
-
-# body membership list
-@app.route('/oparl/body/<string:body_id>/membership')
-def oparl_body_membership(body_id):
-  return oparl_basic(oparl_body_membership_data,
-                     params={'body_id': body_id})
-
-def oparl_body_membership_data(params):
-  data = db.get_membership(membership_list = True,
-                       search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                       add_prefix = "%s/oparl/membership/" % app.config['api_url'],
-                       add_postfix = generate_postfix(params))
-  return data
+  
 
 # body person list
 @app.route('/oparl/body/<string:body_id>/person')
@@ -147,12 +151,25 @@ def oparl_body_person(body_id):
   return oparl_basic(oparl_body_person_data,
                      params={'body_id': body_id})
 
+
 def oparl_body_person_data(params):
-  data = db.get_person(person_list = True,
-                       search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                       add_prefix = "%s/oparl/person/" % app.config['api_url'],
-                       add_postfix = generate_postfix(params))
+  search_params = oparl_generate_list_search_params(params)
+  data = db.get_person(search_params = search_params,
+                       limit=app.config['oparl_items_per_page'],
+                       deref={'values': ['membership']})
+  data = oparl_generate_list_items(params=params,
+                                   search_params=search_params,
+                                   result_count=db.get_person_count(search_params=search_params),
+                                   data=data,
+                                   type='person')
+  for key_person, single_person in enumerate(data['items']):
+    data['items'][key_person] = oparl_person_layout(data=single_person, params=params)
+    memberships = []
+    for single_membership in data['items'][key_person]['membership']:
+      memberships.append(oparl_membership_layout(single_membership, params))
+    data['items'][key_person]['membership'] = memberships
   return data
+
 
 # body meeting list
 @app.route('/oparl/body/<string:body_id>/meeting')
@@ -161,37 +178,55 @@ def oparl_body_meeting(body_id):
                      params = {'body_id': body_id})
 
 def oparl_body_meeting_data(params):
-  data = db.get_meeting(meeting_list = True,
-                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                        add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
-                        add_postfix = generate_postfix(params))
+  search_params = oparl_generate_list_search_params(params)
+  data = db.get_meeting(search_params = search_params,
+                       limit=app.config['oparl_items_per_page'],
+                       deref={'values': ['invitation', 'resultsProtocol', 'agendaItem', 'auxiliaryFile']})
+  data = oparl_generate_list_items(params=params,
+                                   search_params=search_params,
+                                   result_count=db.get_meeting_count(search_params=search_params),
+                                   data=data,
+                                   type='meeting')
+  for key_meeting, single_meeting in enumerate(data['items']):
+    data['items'][key_meeting] = oparl_meeting_layout(data=single_meeting, params=params)
+    # auxiliaryFiles
+    if 'auxiliaryFile' in data['items'][key_meeting]:
+      auxiliaryFiles = []
+      for single_auxiliaryFile in data['items'][key_meeting]['auxiliaryFile']:
+        if single_auxiliaryFile:
+          auxiliaryFiles.append(oparl_file_layout(single_auxiliaryFile, params))
+      if len(auxiliaryFiles):
+        data['items'][key_meeting]['auxiliaryFile'] = auxiliaryFiles
+      else:
+        del data['items'][key_meeting]['auxiliaryFile']
+    # agendaItems
+    if 'agendaItem' in data['items'][key_meeting]:
+      agendaItems = []
+      for single_agendaItem in data['items'][key_meeting]['agendaItem']:
+        if single_agendaItem:
+          agendaItems.append(oparl_agendaItem_layout(single_agendaItem, params))
+      if len(agendaItems):
+        data['items'][key_meeting]['agendaItem'] = agendaItems
+      else:
+        del data['items'][key_meeting]['agendaItem']
+    # resultsProtocol
+    if 'resultsProtocol' in data['items'][key_meeting]:
+      if data['items'][key_meeting]['resultsProtocol']:
+        data['items'][key_meeting]['resultsProtocol'] = oparl_file_layout(data['items'][key_meeting]['resultsProtocol'], params)
+      else:
+        del data['items'][key_meeting]['resultsProtocol']
+    # invitation
+    if 'invitation' in data['items'][key_meeting]:
+      if isinstance(data['items'][key_meeting]['invitation'], list):
+        # TODO: invitation = list? wtf?!
+        del data['items'][key_meeting]['invitation']
+      else:
+        if data['items'][key_meeting]['invitation']:
+          data['items'][key_meeting]['invitation'] = oparl_file_layout(data['items'][key_meeting]['invitation'], params)
+        else:
+          del data['items'][key_meeting]['invitation']
   return data
 
-# body agendaitem list
-@app.route('/oparl/body/<string:body_id>/agendaItem')
-def oparl_body_agendaItem(body_id):
-  return oparl_basic(oparl_body_agendaItem_data,
-                     params = {'body_id': body_id})
-
-def oparl_body_agendaItem_data(params):
-  data = db.get_agendaItem(agendaItem_list = True,
-                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                        add_prefix = "%s/oparl/agendaItem/" % app.config['api_url'],
-                        add_postfix = generate_postfix(params))
-  return data
-
-# body consultation list
-@app.route('/oparl/body/<string:body_id>/consultation')
-def oparl_body_consultation(body_id):
-  return oparl_basic(oparl_body_consultation_data,
-                     params = {'body_id': body_id})
-
-def oparl_body_consultation_data(params):
-  data = db.get_consultation(consultation_list = True,
-                        search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                        add_prefix = "%s/oparl/consultation/" % app.config['api_url'],
-                        add_postfix = generate_postfix(params))
-  return data
 
 # body paper list
 @app.route('/oparl/body/<string:body_id>/paper')
@@ -200,38 +235,39 @@ def oparl_body_paper(body_id):
                      params={'body_id': body_id})
 
 def oparl_body_paper_data(params):
-  data = db.get_paper(paper_list=True,
-                      search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                      add_prefix =  "%s/oparl/paper/" % app.config['api_url'],
-                      add_postfix = generate_postfix(params))
+  search_params = oparl_generate_list_search_params(params)
+  data = db.get_paper(search_params = search_params,
+                       limit=app.config['oparl_items_per_page'],
+                       deref={'values': ['mainFile', 'auxiliaryFile', 'consultation', 'location', 'originatorPerson', 'originatorOrganization']})
+  data = oparl_generate_list_items(params=params,
+                                   search_params=search_params,
+                                   result_count=db.get_paper_count(search_params=search_params),
+                                   data=data,
+                                   type='person')
+  for key_paper, single_paper in enumerate(data['items']):
+    data['items'][key_paper] = oparl_paper_layout(data=single_paper, params=params)
+    # mainFile
+    if 'mainFile' in data['items'][key_paper]:
+      if data['items'][key_paper]['mainFile']:
+        data['items'][key_paper]['mainFile'] = oparl_file_layout(data['items'][key_paper]['mainFile'], params)
+      else:
+        del data['items'][key_paper]['mainFile']
+    # auxiliaryFiles
+    if 'auxiliaryFile' in data['items'][key_paper]:
+      auxiliaryFiles = []
+      for single_auxiliaryFile in data['items'][key_paper]['auxiliaryFile']:
+        if single_auxiliaryFile:
+          auxiliaryFiles.append(oparl_file_layout(single_auxiliaryFile, params))
+      if len(auxiliaryFiles):
+        data['items'][key_paper]['auxiliaryFile'] = auxiliaryFiles
+      else:
+        del data['items'][key_paper]['auxiliaryFile']
   return data
 
-# body file list
-@app.route('/oparl/body/<string:body_id>/file')
-def oparl_body_file(body_id):
-  return oparl_basic(oparl_body_file_data,
-                     params={'body_id': body_id})
-
-def oparl_body_file_data(params):
-  data = db.get_file(file_list=True,
-                     search_params = {'body': DBRef('body', ObjectId(params['body_id']))},
-                     add_prefix = "%s/oparl/file/" % app.config['api_url'],
-                     add_postfix = generate_postfix(params))
-  return data
 
 ####################################################
 # organization
 ####################################################
-
-# organization list
-@app.route('/oparl/organization')
-def oparl_organizations():
-  return oparl_basic(oparl_organizations_data)
-
-def oparl_organizations_data(params):
-  return db.get_organization(organization_list=True,
-                             add_prefix = "%s/oparl/organization/" % app.config['api_url'],
-                             add_postfix=generate_postfix(params))
 
 # single organization
 @app.route('/oparl/organization/<string:organization_id>')
@@ -241,15 +277,31 @@ def oparl_organization(organization_id):
 def oparl_organization_data(params):
   data = db.get_organization(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data[0]['body'].id, generate_postfix(params))
-    data[0]['membership'] = generate_sublist_url(params=params, main_type='organization', sublist_type='membership')
-    data[0]['meeting'] = generate_sublist_url(params=params, main_type='organization', sublist_type='meeting')
-    data[0]['@type'] = 'OParlCommittee'
-    data[0]['@id'] = data[0]['_id']
-    return data[0]
-  elif len(data) == 0:
+    return oparl_organization_layout(data[0], params)
+  else:
     abort(404)
 
+def oparl_organization_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/organization/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'https://oparl.org/schema/1.0/Organization'
+  data['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['body'].id, generate_postfix(params))
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  if 'startDate' in data:
+    if isinstance(data['startDate'], datetime.datetime):
+      data['startDate'] = data['startDate'].strftime("%Y-%m-%d")
+  if 'endDate' in data:
+    if isinstance(data['endDate'], datetime.datetime):
+      data['endDate'] = data['endDate'].strftime("%Y-%m-%d")
+  
+  # delete stuff
+  del data['_id']
+  return data
+
+"""
 # organization membership list
 @app.route('/oparl/organization/<string:organization_id>/membership')
 def oparl_rganization_membership(organization_id):
@@ -262,6 +314,7 @@ def oparl_organization_membership_data(params):
                            add_postfix = generate_postfix(params))
   return data
 
+
 # organization meeting list
 @app.route('/oparl/organization/<string:organization_id>/meeting')
 def oparl_organization_meeting(organization_id):
@@ -273,11 +326,13 @@ def oparl_organization_meeting_data(params):
                         add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
+"""
 
 ####################################################
 # membership
 ####################################################
 
+"""
 # membership list
 @app.route('/oparl/membership')
 def oparl_memberships():
@@ -287,8 +342,9 @@ def oparl_memberships_data(params):
   return db.get_membership(membership_list=True,
                            add_prefix = "%s/oparl/membership/" % app.config['api_url'],
                            add_postfix=generate_postfix(params))
+"""
 
-# single organization
+# single membership
 @app.route('/oparl/membership/<string:membership_id>')
 def oparl_membership(membership_id):
   return oparl_basic(oparl_membership_data, params={'_id': membership_id})
@@ -296,28 +352,36 @@ def oparl_membership(membership_id):
 def oparl_membership_data(params):
   data = db.get_membership(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
-    data[0]['organization'] = generate_single_url(params=params, type='organization', id=data[0]['organization'].id)
-    data[0]['person'] = generate_single_backref_url(params=params, get='get_person', type='person', reverse_type='membership', id=params['_id'])
-    data[0]['@type'] = 'OParlMembership'
-    data[0]['@id'] = data[0]['_id']
-    return data[0]
+    return oparl_membership_layout(data[0], params)
   elif len(data) == 0:
     abort(404)
+
+def oparl_membership_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/membership/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'http://oparl.org/schema/1.0/Membership'
+  data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  if 'startDate' in data:
+    if isinstance(data['startDate'], datetime.datetime):
+      data['startDate'] = data['startDate'].strftime("%Y-%m-%d")
+  if 'endDate' in data:
+    if isinstance(data['endDate'], datetime.datetime):
+      data['endDate'] = data['endDate'].strftime("%Y-%m-%d")
+  
+  # delete stuff
+  if 'organization' in data:
+    del data['organization']
+  del data['_id']
+  return data
+  
 
 ####################################################
 # person
 ####################################################
-
-# person list
-@app.route('/oparl/person')
-def oparl_persons():
-  return oparl_basic(oparl_persons_data)
-
-def oparl_persons_data(params):
-  return db.get_person(person_list=True,
-                       add_prefix = "%s/oparl/person/" % app.config['api_url'],
-                       add_postfix=generate_postfix(params))
 
 # single person
 @app.route('/oparl/person/<string:person_id>')
@@ -329,12 +393,26 @@ def oparl_person_data(params):
   if len(data) == 1:
     data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
     data[0]['membership'] = generate_sublist_url(params=params, main_type='person', sublist_type='membership')
-    data[0]['@type'] = 'OParlPerson'
-    data[0]['@id'] = data[0]['_id']
+    data[0]['type'] = 'OParlPerson'
+    data[0]['id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
 
+def oparl_person_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/person/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'http://oparl.org/schema/1.0/Person'
+  data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # delete stuff
+  del data['_id']
+  return data
+
+
+"""
 # person membership list
 @app.route('/oparl/person/<string:person_id>/membership')
 def oparl_person_membership(person_id):
@@ -346,20 +424,11 @@ def oparl_person_membership_data(params):
                        add_prefix = "%s/oparl/membership/" % app.config['api_url'],
                        add_postfix = generate_postfix(params))
   return data
+"""
 
 ####################################################
 # meeting
 ####################################################
-
-# meeting list
-@app.route('/oparl/meeting')
-def oparl_meetings():
-  return oparl_basic(oparl_meetings_data)
-
-def oparl_meetings_data(params):
-  return db.get_meeting(meeting_list = True,
-                        add_prefix = "%s/oparl/meeting/" % app.config['api_url'],
-                        add_postfix=generate_postfix(params))
 
 # single meeting
 @app.route('/oparl/meeting/<string:meeting_id>')
@@ -378,12 +447,33 @@ def oparl_meeting_data(params):
     if 'verbatimProtocol' in data[0]:
       data[0]['verbatimProtocol'] = generate_single_url(params=params, type='file', id=data[0]['verbatimProtocol'].id)
     data[0]['auxiliaryFile'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='auxiliaryFile')
-    data[0]['@type'] = 'OParlMeeting'
-    data[0]['@id'] = data[0]['_id']
+    data[0]['type'] = 'OParlMeeting'
+    data[0]['id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
 
+def oparl_meeting_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/meeting/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'http://oparl.org/schema/1.0/Meeting'
+  data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  if 'start' in data:
+    if isinstance(data['start'], datetime.datetime):
+      data['start'] = data['start'].strftime("%Y-%m-%dT%H:%M:%S")
+  if 'end' in data:
+    if isinstance(data['end'], datetime.datetime):
+      data['end'] = data['end'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # delete stuff
+  del data['_id']
+  return data
+
+"""
 # meeting organization list
 @app.route('/oparl/meeting/<string:meeting_id>/organization')
 def oparl_meeting_organization(meeting_id):
@@ -431,20 +521,11 @@ def oparl_meeting_auxiliaryFile_data(params):
                         add_prefix = "%s/oparl/file/" % app.config['api_url'],
                         add_postfix = generate_postfix(params))
   return data
+"""
 
 ####################################################
 # agendaItem
 ####################################################
-
-# agendaItem list
-@app.route('/oparl/agendaitem')
-def oparl_agendaItems():
-  return oparl_basic(oparl_agendaItems_data)
-
-def oparl_agendaItems_data(params):
-  return db.get_agendaItem(agendaItem_list = True,
-                           add_prefix = "%s/oparl/agendaitem/" % app.config['api_url'],
-                           add_postfix=generate_postfix(params))
 
 # single agendaItem
 @app.route('/oparl/agendaItem/<string:agendaItem_id>')
@@ -458,16 +539,37 @@ def oparl_agendaItem_data(params):
     data[0]['meeting'] = generate_single_backref_url(params=params, get='get_meeting', type='meeting', reverse_type='agendaItem', id=params['_id'])
     if 'consultation' in data[0]:
       data[0]['consultation'] = generate_single_url(params=params, type='consultation', id=data[0]['consultation'].id)
-    data[0]['@type'] = 'OParlAgendaItem'
-    data[0]['@id'] = data[0]['_id']
+    data[0]['type'] = 'OParlAgendaItem'
+    data[0]['id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
+
+def oparl_agendaItem_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/agendaItem/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'http://oparl.org/schema/1.0/AgendaItem'
+  data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  if 'start' in data:
+    if isinstance(data['start'], datetime.datetime):
+      data['start'] = data['start'].strftime("%Y-%m-%dT%H:%M:%S")
+  if 'end' in data:
+    if isinstance(data['end'], datetime.datetime):
+      data['end'] = data['end'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # delete stuff
+  del data['_id']
+  return data
 
 ####################################################
 # consultation
 ####################################################
 
+"""
 # consultation list
 @app.route('/oparl/consultation')
 def oparl_consultations():
@@ -477,6 +579,7 @@ def oparl_consultations_data(params):
   return db.get_consultation(consultation_list = True,
                            add_prefix = "%s/oparl/consultation/" % app.config['api_url'],
                            add_postfix=generate_postfix(params))
+"""
 
 # single consultation
 @app.route('/oparl/consultation/<string:consultation_id>')
@@ -490,12 +593,30 @@ def oparl_consultation_data(params):
     data[0]['agendaItem'] = generate_single_backref_url(params=params, get='get_agendaItem', type='agendaItem', reverse_type='consultation', id=params['_id'])
     data[0]['paper'] = generate_single_url(params=params, type='paper', id=data[0]['paper'].id)
     data[0]['organization'] = generate_sublist_url(params=params, main_type='consultation', sublist_type='organization')
-    data[0]['@type'] = 'OParlConsultation'
-    data[0]['@id'] = data[0]['_id']
+    data[0]['type'] = 'OParlConsultation'
+    data[0]['id'] = data[0]['_id']
     return data[0]
   elif len(data) == 0:
     abort(404)
 
+def oparl_consultation_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/consultation/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'http://oparl.org/schema/1.0/Consultation'
+  data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  if 'publishedDate' in data:
+    if isinstance(data['publishedDate'], datetime.datetime):
+      data['publishedDate'] = data['publishedDate'].strftime("%Y-%m-%d")
+  
+  # delete stuff
+  del data['_id']
+  return data
+
+"""
 # consultation organization list
 @app.route('/oparl/consultation/<string:consultation_id>/organization')
 def oparl_consultation_meeting(consultation_id):
@@ -507,21 +628,11 @@ def oparl_consultation_organization_data(params):
                              add_prefix = "%s/oparl/organization/" % app.config['api_url'],
                              add_postfix = generate_postfix(params))
   return data
-
+"""
 
 ####################################################
 # paper
 ####################################################
-
-# paper list
-@app.route('/oparl/paper')
-def oparl_papers():
-  return oparl_basic(oparl_papers_data)
-
-def oparl_papers_data(params):
-  return db.get_paper(paper_list = True,
-                      add_prefix = "%s/oparl/paper/" % app.config['api_url'],
-                      add_postfix = generate_postfix(params))
 
 # single paper
 @app.route('/oparl/paper/<string:paper_id>')
@@ -531,22 +642,37 @@ def oparl_paper(paper_id):
 def oparl_paper_data(params):
   data = db.get_paper(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
-    data[0]['relatedPaper'] = generate_sublist_url(params=params, main_type='paper', sublist_type='relatedPaper')
-    data[0]['superordinatedPaper'] = generate_sublist_url(params=params, main_type='paper', sublist_type='superordinatedPaper')
-    data[0]['subordinatedPaper'] = generate_sublist_url(params=params, main_type='paper', sublist_type='subordinatedPaper')
-    if 'mainFile' in data[0]:
-      data[0]['mainFile'] = generate_single_url(params=params, type='file', id=data[0]['mainFile'].id)
-    data[0]['auxiliaryFile'] = generate_sublist_url(params=params, main_type='paper', sublist_type='auxiliaryFile')
-    #data[0]['originator'] = generate_sublist_url(params=params, main_type='file', sublist_type='paper') #TODO: BAEH - mixed organization + people
-    data[0]['consultation'] = generate_sublist_url(params=params, main_type='paper', sublist_type='consultation')
-    data[0]['underDirectionOf'] = generate_sublist_url(params=params, main_type='paper', sublist_type='underDirectionOf')
-    data[0]['@type'] = 'OParlPaper'
-    data[0]['@id'] = data[0]['_id']
-    return data[0]
+    return oparl_paper_layout(data[0])
   elif len(data) == 0:
     abort(404)
 
+def oparl_paper_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/paper/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'http://oparl.org/schema/1.0/Paper'
+  data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  if 'publishedDate' in data:
+    if isinstance(data['publishedDate'], datetime.datetime):
+      data['publishedDate'] = data['publishedDate'].strftime("%Y-%m-%d")
+  
+  # TODO for data model
+  if 'georeferences' in data:
+    del data['georeferences']
+  if 'georeferences' in data:
+    del data['georeferencesGenerated']
+  if 'title' in data:
+    del data['title']
+  
+  # delete stuff
+  del data['_id']
+  return data
+
+
+"""
 # paper auxiliaryFile list
 @app.route('/oparl/paper/<string:paper_id>/auxiliaryFile')
 def oparl_paper_auxiliaryFile(paper_id):
@@ -636,12 +762,13 @@ def oparl_paper_underDirectionOf_data(params):
                       add_prefix = "%s/oparl/consultation/" % app.config['api_url'],
                       add_postfix = generate_postfix(params))
   return data
-
+"""
 
 ####################################################
 # file
 ####################################################
 
+"""
 # file list
 @app.route('/oparl/file')
 def oparl_files():
@@ -651,6 +778,7 @@ def oparl_files_data(params):
   return db.get_file(file_list = True,
                      add_prefix = "%s/oparl/file/" % app.config['api_url'],
                      add_postfix=generate_postfix(params))
+"""
 
 # single file
 @app.route('/oparl/file/<string:file_id>')
@@ -660,22 +788,49 @@ def oparl_document(file_id):
 def oparl_file_data(params):
   data = db.get_file(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
-    data[0]['accessUrl'] = generate_sublist_url(params=params, main_type='file', sublist_type='accessUrl')
-    data[0]['downloadUrl'] = generate_sublist_url(params=params, main_type='file', sublist_type='downloadUrl')
-    data[0]['meeting'] = generate_sublist_url(params=params, main_type='file', sublist_type='meeting')
-    data[0]['paper'] = generate_sublist_url(params=params, main_type='file', sublist_type='paper')
-    if 'masterFile' in data[0]:
-      data[0]['masterFile'] = generate_single_url(params=params, type='file', id=data[0]['mainFile'].id)
-    data[0]['derivativeFile'] = generate_sublist_url(params=params, main_type='file', sublist_type='derivativeFile')
-    data[0]['@type'] = 'OParlPaper'
-    data[0]['@id'] = data[0]['_id']
-    if 'file' in data[0]:
-      del data[0]['file']
-    return data[0]
+    return (oparl_file_layout(data[0], params))
   elif len(data) == 0:
     abort(404)
 
+def oparl_file_layout(data, params):
+  # default values
+  data['id'] = "%s/oparl/file/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['type'] = 'https://oparl.org/schema/1.0/File'
+  data['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['body'].id, generate_postfix(params))
+  data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S")
+  data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S")
+  
+  # additional transformations
+  data['accessUrl'] = "%s/oparl/file/%s/access%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  data['downloadUrl'] = "%s/oparl/file/%s/download%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
+  if 'date' in data:
+    if isinstance(data['date'], datetime.datetime):
+      data['date'] = data['date'].strftime("%Y-%m-%d")
+  
+  # TODO: rename stuff
+  if 'fulltext' in data:
+    data['text'] = data['fulltext']
+    del data['fulltext']
+  if 'mimetype' in data:
+    data['mimeType'] = data['mimetype']
+    del data['mimetype']
+  if 'filename' in data:
+    data['fileName'] = data['filename']
+    del data['filename']
+  
+  # delete stuff
+  del data['_id']
+  if 'file' in data:
+    del data['file']
+  if 'thumbnails' in data:
+    del data['thumbnails']
+  if 'fulltextGenerated' in data:
+    del data['fulltextGenerated']
+  if 'thumbnailsGenerated' in data:
+    del data['thumbnailsGenerated']
+  return data
+
+"""
 # file meeting list
 @app.route('/oparl/file/<string:file_id>/meeting')
 def oparl_file_meeting(file_id):
@@ -717,6 +872,7 @@ def oparl_file_paper_data(params):
                                     add_postfix = generate_postfix(params))
   data = mainFile_data + auxiliaryFile_data
   return data
+"""
 
 # file accessUrl
 @app.route('/oparl/file/<string:file_id>/accessUrl')
@@ -816,6 +972,9 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
   extended_info = extended_info == '1'
   if extended_info:
     request_info['i'] = 1
+  search_query = request.args.get('q', "")
+  if search_query:
+    request_info['q'] = search_query
   page = request.args.get('page')
   try:
     page = int(page)
@@ -835,7 +994,7 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
     }
   else:
     ret = response
-  json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
+  json_output = json.dumps(ret, cls=util.MyEncoder)#, sort_keys=True)
   if jsonp_callback is not None:
     json_output = jsonp_callback + '(' + json_output + ')'
   if html:
@@ -849,7 +1008,7 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
     return response
 
 
-def generate_postfix(params):
+def generate_postfix(params, additional_params=[]):
   postfix = []
   if 'html' in params:
     postfix.append('html='+str(params['html']))
@@ -858,6 +1017,7 @@ def generate_postfix(params):
       postfix.append('p='+str(params['p']))
   if 'i' in params:
     postfix.append('i='+str(params['i']))
+  postfix = postfix + additional_params
   if len(postfix):
     postfix = '?'+'&'.join(postfix)
   else:
@@ -876,227 +1036,20 @@ def generate_single_backref_url(params={}, get='', type='', reverse_type='', id=
   uid = str((get(search_params={reverse_type: DBRef(reverse_type, ObjectId(id))}, values={'_id':1}))[0]['_id'])
   return "%s/oparl/%s/%s%s" % (app.config['api_url'], type, uid, generate_postfix(params))
 
+def oparl_generate_list_search_params(params):
+  search_params = {'body': DBRef('body', ObjectId(params['body_id']))}
+  if 'q' in params:
+    search_params['modified'] = { '$lt': datetime.datetime.strptime(params['q'].split(':<')[1], "%Y-%m-%dT%H:%M:%S.%f") }
+  return search_params
 
-#"%s/oparl/body/%s/organization%s" % (app.config['api_url'], params['_id'], generate_postfix(params))
-
-
-
-# old stuff
-
-@app.route("/oparl2/person/")
-def oparl_documentsss():
-  """
-  API-Methode zur Suche von Dokumenten bzw. zum Abruf eines einzelnen
-  Dokuments anhand einer Kennung (reference).
-  Ist der URL-Parameter "reference" angegeben, handelt es sich um eine
-  Dokumentenabfrage anhand der Kennung(en). Ansonsten ist es eine Suche.
-  """
-  start_time = time.time()
-  jsonp_callback = request.args.get('callback', None)
-  ref = request.args.get('reference', '')
-  references = ref.split(',')
-  if references == ['']:
-    references = None
-  output = request.args.get('output', '').split(',')
-  rs = util.get_rs()
-  q = request.args.get('q', '*:*')
-  fq = request.args.get('fq', '')
-  sort = request.args.get('sort', 'score desc')
-  start = int(request.args.get('start', '0'))
-  numdocs = int(request.args.get('docs', '10'))
-  date_param = request.args.get('date', '')
-  get_attachments = 'attachments' in output
-  get_thumbnails = 'thumbnails' in output and get_attachments
-  get_consultations = 'consultations' in output
-  get_facets = 'facets' in output
-  #get_relations = 'relations' in output
-  request_info = {}  # Info über die Anfrage
-  query = False
-  docs = False
-  submission_ids = []
-  # TODO: entscheiden, was mit get_relations passiert
-  """
-  Anhand der übergebenen Parameter wird entschieden, ob eine ES-Suche
-  durchgeführt wird, oder ob die Abfrage direkt anhand von Kennungen
-  (references) erfolgen kann.
-  """
-  
-  if references is None:
-    # Suche wird durchgeführt
-    # (References-Liste via Suchmaschine füllen)
-    query = db.query_submissions(rs=rs, q=q, fq=fq, sort=sort, start=start,
-               docs=numdocs, date=date_param, facets=get_facets)
-    if query['numhits'] > 0:
-      submission_ids = [x['_id'] for x in query['result']]
-    else:
-      docs = []
-  else:
-    # Direkte Abfrage
-    request_info = {
-      'references': references
-    }
-  request_info['output'] = output
-
-  # Abrufen der benötigten Dokumente aus der Datenbank
-  if references is not None:
-    docs = db.get_submissions(rs=rs, references=references,
-            get_attachments=get_attachments,
-            get_consultations=get_consultations,
-            get_thumbnails=get_thumbnails)
-  elif len(submission_ids) > 0:
-    docs = db.get_submissions(rs=rs, submission_ids=submission_ids,
-            get_attachments=get_attachments,
-            get_consultations=get_consultations,
-            get_thumbnails=get_thumbnails)
-
-  ret = {
-    'status': 0,
-    'duration': int((time.time() - start_time) * 1000),
-    'request': request_info,
-    'response': {}
+def oparl_generate_list_items(params, search_params, result_count, data, type):
+  result = {
+    'items': data,
+    'itemsPerPage': app.config['oparl_items_per_page']
   }
-  if docs:
-    ret['response']['documents'] = docs
-    ret['response']['numdocs'] = len(docs)
-    if query and 'maxscore' in query:
-      ret['response']['maxscore'] = query['maxscore']
-    for n in range(len(docs)):
-      docs[n]['reference'] = docs[n]['identifier']
-      del docs[n]['identifier']
+  if result_count > app.config['oparl_items_per_page']:
+    result['nextPage'] = '%s/oparl/body/%s/%s%s' % (app.config['api_url'], params['body_id'], type, generate_postfix(params, ['q=modified:<%s' % result['items'][9]['modified'].strftime("%Y-%m-%dT%H:%M:%S.%f")]))
+  if 'modified' in search_params:
+    result['firstPage'] = '%s/oparl/body/%s/%s%s' % (app.config['api_url'], params['body_id'], type, generate_postfix(params))
+  return result
 
-  if query:
-    ret['response']['numhits'] = query['numhits']
-    if get_facets and 'facets' in query:
-      ret['response']['facets'] = query['facets']
-  
-  ret['response']['start'] = start
-  ret['request']['sort'] = sort
-  ret['request']['fq'] = fq
-
-  json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
-  if jsonp_callback is not None:
-    json_output = jsonp_callback + '(' + json_output + ')'
-  response = make_response(json_output, 200)
-  response.mimetype = 'application/json'
-  response.headers['Expires'] = util.expires_date(hours=24)
-  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
-  return response
-
-
-@app.route("/oparl2/locations")
-def oparl_locations():
-  start_time = time.time()
-  jsonp_callback = request.args.get('callback', None)
-  rs = util.get_rs()
-  street = request.args.get('street', '')
-  if street == '':
-    abort(400)
-  result = db.get_locations_by_name(rs, street)
-  ret = {
-    'status': 0,
-    'duration': round((time.time() - start_time) * 1000),
-    'request': {
-      'street': street
-    },
-    'response': result
-  }
-  json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
-  if jsonp_callback is not None:
-    json_output = jsonp_callback + '(' + json_output + ')'
-  response = make_response(json_output, 200)
-  response.mimetype = 'application/json'
-  response.headers['Expires'] = util.expires_date(hours=24)
-  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
-  return response
-
-
-@app.route("/oparl2/streets")
-def oparl_streets():
-  start_time = time.time()
-  jsonp_callback = request.args.get('callback', None)
-  rs = util.get_rs()
-  if not rs:
-    return
-  lon = request.args.get('lon', '')
-  lat = request.args.get('lat', '')
-  radius = request.args.get('radius', '1000')
-  if lat == '' or lon == '':
-    abort(400)
-  lon = float(lon)
-  lat = float(lat)
-  radius = int(radius)
-  radius = min(radius, 500)
-  result = db.get_locations(rs, lon, lat, radius)
-  ret = {
-    'status': 0,
-    'duration': round((time.time() - start_time) * 1000),
-    'request': {
-      'rs': rs,
-      'lon': lon,
-      'lat': lat,
-      'radius': radius
-    },
-    'response': result
-  }
-  try:
-    json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
-  except AttributeError:
-    print >> sys.stderr, ret
-    return null
-  
-  if jsonp_callback is not None:
-    json_output = jsonp_callback + '(' + json_output + ')'
-  response = make_response(json_output, 200)
-  response.mimetype = 'application/json'
-  response.headers['Expires'] = util.expires_date(hours=24)
-  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
-  return response
-
-
-# old: /api/session
-@app.route("/oparl2/meeting")
-def oparl_session():
-  jsonp_callback = request.args.get('callback', None)
-  location_entry = request.args.get('location_entry', '')
-  lat = request.args.get('lat', '')
-  lon = request.args.get('lon', '')
-  region_id = request.args.get('region_id', '')
-  if region_id != '':
-    session['region_id'] = region_id
-  if location_entry != '':
-    session['location_entry'] = location_entry.encode('utf-8')
-  if lat != '':
-    session['lat'] = lat
-  if lon != '':
-    session['lon'] = request.args.get('lon', '')
-  ret = {
-    'status': 0,
-    'response': {
-      'location_entry': (session['location_entry'] if ('location_entry' in session) else None),
-      'lat': (session['lat'] if ('lat' in session) else None),
-      'lon': (session['lon'] if ('lon' in session) else None),
-      'region_id': (session['region_id'] if ('region_id' in session) else 'xxxxxxxxxxxx'),
-      'region': (app.app.config['RSMAP'][session['region_id']] if ('region_id' in session) else app.app.config['RSMAP']['xxxxxxxxxxxx'])
-    }
-  }
-  json_output = json.dumps(ret, cls=util.MyEncoder, sort_keys=True)
-  if jsonp_callback is not None:
-    json_output = jsonp_callback + '(' + json_output + ')'
-  response = make_response(json_output, 200)
-  response.mimetype = 'application/json'
-  return response
-
-
-@app.route("/oparl2/response", methods=['POST'])
-def oparl_response():
-  attachment_id = request.form['id']
-  name = request.form['name']
-  email = request.form['email']
-  response_type = request.form['type']
-  message = request.form['message']
-  sent_on = request.form['sent_on']
-  ip = str(request.remote_addr)
-  db.add_response({'attachment_id': attachment_id, 'sent_on': sent_on, 'ip': ip, 'name': name, 'email': email, 'response_type': response_type, 'message': message})
-  response = make_response('1', 200)
-  response.mimetype = 'application/json'
-  return response

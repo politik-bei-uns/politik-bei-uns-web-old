@@ -36,10 +36,12 @@ from flask import Response
 from flask import Markup
 from flask import session
 from flask.ext.basicauth import BasicAuth
+from flask.ext.pymongo import PyMongo
 
 from webapp import app, mongo, basic_auth
 from forms import *
 from oparl import oparl_file_accessUrl
+
 
 
 @app.route("/")
@@ -333,7 +335,7 @@ def admin_config():
 @app.route('/admin/regions', methods=['GET', 'POST'])
 @basic_auth.required
 def admin_regions():
-  return render_template('admin_regions.html', regions=mongo.db.region.find())
+  return render_template('admin_regions.html', regions=mongo.db.region.find().sort('_id', 1))
 
 @app.route('/admin/region/new', methods=['GET', 'POST'])
 @basic_auth.required
@@ -399,7 +401,8 @@ def admin_region_edit():
 @app.route('/admin/bodies', methods=['GET', 'POST'])
 @basic_auth.required
 def admin_bodies():
-  return render_template('admin_bodies.html', bodies=mongo.db.body.find())
+  
+  return render_template('admin_bodies.html', bodies=mongo.db.body.find().sort('_id', 1))
 
 @app.route('/admin/body/new', methods=['GET', 'POST'])
 @basic_auth.required
