@@ -26,6 +26,7 @@ import urllib2
 import sys
 from flask import request
 from collections import OrderedDict
+import HTMLParser
 
 from webapp import app, mongo
 
@@ -198,3 +199,9 @@ def dottify(value):
   return value
 
 app.jinja_env.filters['dottify'] = dottify
+
+def utfunescape(value):
+  h = HTMLParser.HTMLParser()
+  return h.unescape(value)
+
+app.jinja_env.filters['utfunescape'] = utfunescape

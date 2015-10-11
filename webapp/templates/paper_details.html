@@ -39,6 +39,10 @@ var ok_document_url = '{{ paper._id }}';
       <td class="value">{{ paper.name }}</td>
     </tr>
     {% endif %}
+    <tr>
+      <td class="label">Körperschaft</td>
+      <td class="value">{{ paper.body.name }}</td>
+    </tr>
     {% if paper.paperType %}
     <tr>
       <td class="label">Art des Dokuments:</td>
@@ -104,19 +108,19 @@ var ok_document_url = '{{ paper._id }}';
       {% for consultation in paper.consultation %}
       <li>
       {% if consultation.agendaItem.meeting %}
-      <b>{{ consultation.agendaItem.meeting.name }}</b>,
+      <b>{{ consultation.agendaItem.meeting.name|utfunescape }}</b>,
       {% if consultation.agendaItem.meeting.start %}
       {{ consultation.agendaItem.meeting.start.strftime('%d.%m.%Y') }}.
       {% endif %}
       {% endif %}
       {% if consultation.agendaItem.name != paper.name %}
-      <br/>Thema: {{ consultation.agendaItem.name }}
+      <br/>Thema: {{ consultation.agendaItem.name|utfunescape }}
       {% endif %}
       {% if consultation.agendaItem.result %}
-      <br />Ergebnis: {{ consultation.agendaItem.result }}
+      <br />Ergebnis: {{ consultation.agendaItem.result|utfunescape }}
       {% endif %}
       {% if consultation.agendaItem.resolution %}
-        &ndash; {{ consultation.agendaItem.resolution }}
+        &ndash; {{ consultation.agendaItem.resolution|utfunescape }}
       {% endif %}
       </li>
       {% endfor %}

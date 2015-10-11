@@ -300,7 +300,7 @@ def suche_feed():
   return response
 
 @app.route("/paper/<string:id>")
-@cache.memoize(timeout=14400)
+#@cache.memoize(timeout=14400)
 def view_paper(id):
   """
   Gibt Dokumenten-Detailseite aus
