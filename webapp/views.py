@@ -164,6 +164,7 @@ def file_show_redirect(file_id):
 
 
 @app.route("/file/<string:file_id>")
+@cache.memoize(timeout=14400)
 def file_show(file_id):
   """
   Anzeigen eines Files

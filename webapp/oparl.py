@@ -391,11 +391,7 @@ def oparl_person(person_id):
 def oparl_person_data(params):
   data = db.get_person(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
-    data[0]['membership'] = generate_sublist_url(params=params, main_type='person', sublist_type='membership')
-    data[0]['type'] = 'OParlPerson'
-    data[0]['id'] = data[0]['_id']
-    return data[0]
+    return oparl_person_layout(data[0], params)
   elif len(data) == 0:
     abort(404)
 
@@ -438,18 +434,7 @@ def oparl_meeting(meeting_id):
 def oparl_meeting_data(params):
   data = db.get_meeting(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
-    data[0]['organization'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='organization')
-    data[0]['agendaItem'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='agendaItem')
-    data[0]['invitation'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='invitation')
-    if 'resultsProtocol' in data[0]:
-      data[0]['resultsProtocol'] = generate_single_url(params=params, type='file', id=data[0]['resultsProtocol'].id)
-    if 'verbatimProtocol' in data[0]:
-      data[0]['verbatimProtocol'] = generate_single_url(params=params, type='file', id=data[0]['verbatimProtocol'].id)
-    data[0]['auxiliaryFile'] = generate_sublist_url(params=params, main_type='meeting', sublist_type='auxiliaryFile')
-    data[0]['type'] = 'OParlMeeting'
-    data[0]['id'] = data[0]['_id']
-    return data[0]
+    return oparl_meeting_layout(data[0], params)
   elif len(data) == 0:
     abort(404)
 
@@ -535,13 +520,7 @@ def oparl_agendaItem(agendaItem_id):
 def oparl_agendaItem_data(params):
   data = db.get_agendaItem(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
-    data[0]['meeting'] = generate_single_backref_url(params=params, get='get_meeting', type='meeting', reverse_type='agendaItem', id=params['_id'])
-    if 'consultation' in data[0]:
-      data[0]['consultation'] = generate_single_url(params=params, type='consultation', id=data[0]['consultation'].id)
-    data[0]['type'] = 'OParlAgendaItem'
-    data[0]['id'] = data[0]['_id']
-    return data[0]
+    return oparl_agendaItem_layout(data[0], params)
   elif len(data) == 0:
     abort(404)
 
@@ -589,13 +568,7 @@ def oparl_consultation(consultation_id):
 def oparl_consultation_data(params):
   data = db.get_consultation(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    data[0]['body'] = generate_single_url(params=params, type='body', id=data[0]['body'].id)
-    data[0]['agendaItem'] = generate_single_backref_url(params=params, get='get_agendaItem', type='agendaItem', reverse_type='consultation', id=params['_id'])
-    data[0]['paper'] = generate_single_url(params=params, type='paper', id=data[0]['paper'].id)
-    data[0]['organization'] = generate_sublist_url(params=params, main_type='consultation', sublist_type='organization')
-    data[0]['type'] = 'OParlConsultation'
-    data[0]['id'] = data[0]['_id']
-    return data[0]
+    return oparl_consultation_layout(data[0], params)
   elif len(data) == 0:
     abort(404)
 
@@ -642,7 +615,7 @@ def oparl_paper(paper_id):
 def oparl_paper_data(params):
   data = db.get_paper(search_params={'_id': ObjectId(params['_id'])})
   if len(data) == 1:
-    return oparl_paper_layout(data[0])
+    return oparl_paper_layout(data[0], params)
   elif len(data) == 0:
     abort(404)
 
