@@ -352,6 +352,7 @@ def admin_region_new():
       save_region_bodies.append(DBRef('body', current_body))
     mongo.db.region.insert({'name': region_form.name.data,
                             'type': region_form.type.data,
+                            'active': region_form.active.data,
                             'lat': region_form.lat.data,
                             'lon': region_form.lon.data,
                             'zoom': region_form.zoom.data,
