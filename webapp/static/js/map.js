@@ -21,6 +21,10 @@ $(document).ready(function(){
   
   // register post region change actions
   OpenRIS.post_region_change = function() {
+    // live search box
+    $.geosearchbox.settings.url = '/api/locations?r=' + OpenRIS.region.id;
+    $.papersearchbox.settings.url = '/api/papers-live?r=' + OpenRIS.region.id;
+    
     map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom).addLayer(backgroundLayer);
     window.history.pushState(String(Date.now()), document.title, "/?r=" + OpenRIS.region.id);
     
@@ -71,7 +75,7 @@ $(document).ready(function(){
   $('<p>').attr('id', 'address-live').css({'top': $('#address').height(), 'width': $('#address').width()}).appendTo($('#address-box'));
   
   $('#address').geosearchbox({
-    'url': '/api/locations',
+    'url': '/api/locations?r=' + OpenRIS.region.id,
     'param': 'l',
     'show_results': function(result) {
       result = result['response'];
@@ -133,7 +137,6 @@ $(document).ready(function(){
       evt.preventDefault();
       if ($('#address-live li.highlighted').length) {
         before = $('#address-live li.highlighted').prev();
-        console.log(before);
         if (before.length) {
           $('#address-live li.highlighted').removeClass('highlighted');
           before.addClass('highlighted');
@@ -314,7 +317,7 @@ $(document).ready(function(){
   $('<p>').attr('id', 'qinput-live').css({'top': $('#qinput').height(), 'width': $('#qinput').width()}).appendTo($('#qinput-box'));
   
   $('#qinput').papersearchbox({
-    'url': '/api/papers-live',
+    'url': '/api/papers-live?r=' + OpenRIS.region.id,
     'param': 'p',
     'show_results': function(result) {
       result = result['response'];
@@ -322,8 +325,7 @@ $(document).ready(function(){
       if (result.length) {
         $('#qinput-live').css({'display': 'block'});
         for (i = 0; i < result.length; i++) {
-          result_html += '<li data-q="' + result[i]['name'] + '\">' + result[i]['name'] + '</li>';
-          // TODO: Suchergebnis-Counter präzisieren, dann /*' (' + result[i]['count'] + ')*/ hinzufügen
+          result_html += '<li data-q="' + result[i]['name'] + '\">' + result[i]['name'] + ' (' + result[i]['count'] + ')</li>';
         }
         result_html += '</ul>';
         $('#qinput-live').html(result_html);
@@ -354,7 +356,6 @@ $(document).ready(function(){
       evt.preventDefault();
       if ($('#qinput-live li.highlighted').length) {
         before = $('#qinput-live li.highlighted').prev();
-        console.log(before);
         if (before.length) {
           $('#qinput-live li.highlighted').removeClass('highlighted');
           before.addClass('highlighted');

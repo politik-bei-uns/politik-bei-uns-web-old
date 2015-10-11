@@ -422,41 +422,47 @@ def query_paper_num(region_id, q):
       'num': result['hits']['total']
     }
 
-def get_papers_live(search_string):
+def get_papers_live(search_string, region_id):
   search_string = search_string.split()
   if not len(search_string):
     return []
   search_string_to_complete = search_string[-1]
   
-  search_string_to_complete_must = [{ 
+  query_parts = []
+  
+  query_parts.append({ 
     'match_phrase_prefix': {
-      'name': search_string_to_complete
+      'text_all': search_string_to_complete
     }
-  }]
-  single_string_full_must = []
+  })
+  
+  query_parts.append({
+    'terms': {
+      'bodyId': app.config['regions'][region_id]['body'],
+      'minimum_should_match': 1
+    }
+  })
+
   if len(search_string[0:-1]):
-    simple_query = [{
+    query_parts.append({
       'query_string': {
         'fields': ['text_all'],
         'query': " ".join(search_string[0:-1]),
         'default_operator': 'and'
       }
-    }]
-  else:
-    simple_query = []
-  
-  
-  
+    })
+
+  print query_parts
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
     fields = 'name',
     body = {
-      #'query': {
-      #  'bool': {
-      #    'must': simple_query + search_string_to_complete_must
-      #  }
-      #},
+      'query': {
+        'bool': {
+          'must': query_parts
+        }
+      },
       'aggs': {
         'fragment': {
           'terms': {
@@ -472,7 +478,7 @@ def get_papers_live(search_string):
     },
     size = 0
   )
-  print result
+  
   search_results = []
   prefix = ""
   if len(search_string[0:-1]):
@@ -484,6 +490,7 @@ def get_papers_live(search_string):
     }
     search_results.append(tmp_search_result)
   return search_results
+
 
 def get_locations_by_name(location_string, region_id):
   """
@@ -504,6 +511,7 @@ def get_locations_by_name(location_string, region_id):
       'minimum_should_match': 1
     }
   })
+  print query_parts
   result = es.search(
     index = app.config['es_location_index'] + '-latest',
     doc_type = 'street',

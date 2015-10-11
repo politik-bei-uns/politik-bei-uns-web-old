@@ -84,14 +84,18 @@ def api_papers_live():
   start_time = time.time()
   jsonp_callback = request.args.get('callback', None)
   paper_string = request.args.get('p', '')
-  region = request.args.get('region', app.config['region_default'])
+  region = request.args.get('r', app.config['region_default'])
+  if not region:
+    region = app.config['region_default']
+  region = request.args.get('region', region)
   if paper_string:
-    result = db.get_papers_live(paper_string)
+    result = db.get_papers_live(paper_string, region)
   ret = {
     'status': 0,
     'duration': round((time.time() - start_time) * 1000),
     'request': {
-      'p': paper_string
+      'p': paper_string,
+      'r': region
     },
     'response': result if paper_string else []
   }
@@ -110,14 +114,18 @@ def api_locations():
   start_time = time.time()
   jsonp_callback = request.args.get('callback', None)
   location = request.args.get('l', '')
-  region = request.args.get('region', app.config['region_default'])
+  region = request.args.get('r', app.config['region_default'])
+  if not region:
+    region = app.config['region_default']
+  print region
   if location:
     result = db.get_locations_by_name(location, region)
   ret = {
     'status': 0,
     'duration': round((time.time() - start_time) * 1000),
     'request': {
-      'l': location
+      'l': location,
+      'r': region
     },
     'response': result if location else []
   }
@@ -189,31 +197,6 @@ def api_streets():
   response.headers['Cache-Control'] = util.cache_max_age(hours=24)
   return response
 
-
-@app.route("/api/proxy/geocode")
-def api_geocode():
-  start = time.time()
-  jsonp_callback = request.args.get('callback', None)
-  address = request.args.get('address', '')
-  region = request.args.get('region', '')
-  if address == '':
-    abort(400)
-  obj = {
-    'result': util.geocode(address, region),
-    'request': {
-      'address': address,
-      'region': region
-    }
-  }
-  obj['duration'] = int((time.time() - start) * 1000)
-  json_output = json.dumps(obj, sort_keys=True)
-  if jsonp_callback is not None:
-    json_output = jsonp_callback + '(' + json_output + ')'
-  response = make_response(json_output, 200)
-  response.mimetype = 'application/json'
-  response.headers['Expires'] = util.expires_date(hours=24)
-  response.headers['Cache-Control'] = util.cache_max_age(hours=24)
-  return response
 
 @app.route('/api/regions')
 def api_regions():
