@@ -651,6 +651,14 @@ a:hover .facetdel {
 	padding: 3px;
 }
 
+#data-statistics th, #data-statistics td {
+	text-align: right;
+}
+
+#data-statistics th.data-statistics-text, #data-statistics td.data-statistics-text {
+	text-align: left;
+}
+
 /* API description */
 
 code {

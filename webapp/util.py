@@ -190,3 +190,11 @@ app.jinja_env.globals.update(is_dict=lambda value: type(value) == type({}) or ty
 app.jinja_env.globals.update(is_list=lambda value: type(value) == type([]))
 app.jinja_env.globals.update(is_link=lambda value: value[0:7] == 'http://' or value[0:8] == 'https://' if isinstance(value, basestring) else False)
 app.jinja_env.globals.update(dir=dir)
+
+def dottify(value):
+  if value:
+    if value > 999:
+      return str(value)[:-3] + '.' + str(value)[-3:]
+  return value
+
+app.jinja_env.filters['dottify'] = dottify

@@ -97,30 +97,41 @@
 		
 		<p>Wie viele Dokumente befinden sich auf {{ config.site_host }}? Hier ein paar Statistiken.</p>
 		
-		<table class="table table-striped">
+		<table class="table table-striped" id="data-statistics">
 			<thead>
 				<tr>
-					<th>Stadt</th>
-					<th>Organisationen</th>
-					<th>Personen</th>
-					<th>Sitzungen</th>
-					<th>Tagesordnungspunkte</th>
-					<th>Vorlagen</th>
-					<th>Dateien</th>
+					<th class="data-statistics-text">Stadt</th>
+					<th class="data-statistics-text">Organisationen</th>
+					<th class="data-statistics-text">Personen</th>
+					<th class="data-statistics-text">Sitzungen</th>
+					<th class="data-statistics-text">Tagesordnungspunkte</th>
+					<th class="data-statistics-text">Vorlagen</th>
+					<th class="data-statistics-text">Dateien</th>
 				</tr>
 			</thead>
+			<tfoot>
+				<tr>
+					<th class="data-statistics-text">Gesamt</th>
+					<th>{{ statistics_all['organization']|dottify }}</th>
+					<th>{{ statistics_all['person']|dottify }}</th>
+					<th>{{ statistics_all['meeting']|dottify }}</th>
+					<th>{{ statistics_all['agendaItem']|dottify }}</th>
+					<th>{{ statistics_all['paper']|dottify }}</th>
+					<th>{{ statistics_all['file']|dottify }}</th>
+				</tr>
+			</tfoot>
 			<tbody>
 				{% for item in statistics %}
 				<tr>
-					<td>{{ item['name'] }}</td>
-					<td>{{ item['organization'] }}</td>
-					<td>{{ item['person'] }}</td>
-					<td>{{ item['meeting'] }}</td>
-					<td>{{ item['agendaItem'] }}</td>
-					<td>{{ item['paper'] }}</td>
-					<td>{{ item['file'] }}</td>
+					<td class="data-statistics-text">{{ item['name'] }}</td>
+					<td>{{ item['organization']|dottify }}</td>
+					<td>{{ item['person']|dottify }}</td>
+					<td>{{ item['meeting']|dottify }}</td>
+					<td>{{ item['agendaItem']|dottify }}</td>
+					<td>{{ item['paper']|dottify }}</td>
+					<td>{{ item['file']|dottify }}</td>
 				</tr>
-				{% endfor %}
+			{% endfor %}
 			</tbody>
 		</table>
 	</div>

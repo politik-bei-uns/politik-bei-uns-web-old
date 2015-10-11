@@ -126,7 +126,15 @@ def daten():
       'paper': db.get_paper_count({'body': DBRef('body', ObjectId(body_id))}),
       'file': db.get_file_count({'body': DBRef('body', ObjectId(body_id))})
     })
-  return render_template('daten.html', data_list=data_list, file_list=file_list, statistics=statistics)
+  statistics_all = {
+      'organization': db.get_organization_count(),
+      'person': db.get_person_count(),
+      'meeting': db.get_meeting_count(),
+      'agendaItem': db.get_agendaItem_count(),
+      'paper': db.get_paper_count(),
+      'file': db.get_file_count()
+    }
+  return render_template('daten.html', data_list=data_list, file_list=file_list, statistics=statistics, statistics_all=statistics_all)
 
 
 @app.route("/disclaimer")
