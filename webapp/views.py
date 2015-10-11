@@ -66,28 +66,28 @@ def index():
   return response
 
 
-@app.route("/api/")
+@app.route("/api")
 def api_home():
   return render_template('api.html')
 
 
-@app.route("/hilfe/")
+@app.route("/hilfe")
 def hilfe():
   return render_template('hilfe.html')
 
-@app.route("/ueber/")
+@app.route("/ueber")
 def ueber():
   return render_template('ueber.html')
 
-@app.route("/impressum/")
+@app.route("/impressum")
 def impressum():
   return render_template('impressum.html')
 
-@app.route("/datenschutz/")
+@app.route("/datenschutz")
 def datenschutz():
   return render_template('datenschutz.html')
 
-@app.route("/daten/")
+@app.route("/daten")
 def daten():
   """
   Anzeige der /daten Seite mit Auflistung der
@@ -118,7 +118,7 @@ def daten():
   return render_template('daten.html', data_list=data_list, file_list=file_list)
 
 
-@app.route("/disclaimer/")
+@app.route("/disclaimer")
 def disclaimer():
   return render_template('disclaimer.html')
 
@@ -190,7 +190,7 @@ def file_download(file_id):
   return oparl_file_accessUrl(file_id)
 
 
-@app.route("/suche/")
+@app.route("/suche")
 def suche():
   """
   URL-Parameter:
@@ -220,7 +220,7 @@ def suche():
   response.headers['Expires'] = '-1'
   return response
 
-@app.route("/suche/feed/")
+@app.route("/suche/feed")
 def suche_feed():
   start_time = time.time()
   jsonp_callback = request.args.get('callback', None)
@@ -272,7 +272,7 @@ def suche_feed():
   response.headers['Cache-Control'] = util.cache_max_age(hours=24)
   return response
 
-@app.route("/paper/<string:id>/")
+@app.route("/paper/<string:id>")
 def view_paper(id):
   """
   Gibt Dokumenten-Detailseite aus

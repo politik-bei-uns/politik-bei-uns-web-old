@@ -47,7 +47,7 @@ var openris_search_settings = {
     <h1 style="margin-bottom: 0">Suche</h1>
   </div>
   <div id="search-form" class="content middle">
-    <form action="/suche/" method="get" id="searchform" accept-charset="utf-8">
+    <form action="/suche" method="get" id="searchform" accept-charset="utf-8">
       <label class="qlabel" for="qinput">Suche:</label>
       <input type="text" id="qinput" name="q" value="{{ search_settings.q }}" autocomplete="off" />
       <a id="search-submit" class="submit awesome extrawide" id="submit" href="/suche/">Suchen</a>
@@ -59,4 +59,4 @@ var openris_search_settings = {
 </div>
 {% endblock %}
 
-{% block footericons %}<li><a href="/suche/feed/?r={{ search_settings.r }}&q={{ search_settings.q }}&fq={{ search_settings.fq }}"><img src="/static/img/footer/rss.png" alt="RSS" /></a></li>{% endblock %}
+{% block footericons %}<li><a href="/suche/feed?r={{ search_settings.r }}&q={{ search_settings.q }}&fq={{ search_settings.fq }}"><img src="/static/img/footer/rss.png" alt="RSS" /></a></li>{% endblock %}

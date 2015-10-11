@@ -29,7 +29,7 @@ $(document).ready(function() {
       if (value)
 	url.push(key + '=' + String(value).replace(/&#34;/g, "\""));
     });
-    window.history.pushState(String(Date.now()), document.title, "/suche/?" + url.join('&'));
+    window.history.pushState(String(Date.now()), document.title, "/suche?" + url.join('&'));
     // run search
     $('#search .result').empty();
     $('#search .result').append('<div class="loading big outer"><div class="loading big inner">Suche...</div></div>');
@@ -196,7 +196,7 @@ $(document).ready(function() {
         sqs = null
       // generate list element
       $('<li>').attr('class', 'current').append(
-			$('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
+			$('<a>').attr('href', '/suche?'+ searchQueryString({fq: sqs}))
 				.attr('title', 'Diese Einschränkung aufheben')
 				.click({'sqs': sqs}, function(evt) {
 					evt.preventDefault();
@@ -223,7 +223,7 @@ $(document).ready(function() {
           sqs = OpenRIS.search_params['fq'] + ';' + name + ':' + quoteFacetValue(facet_data[i].key);
 				// generate list element
 				list_element = $('<li>').append(
-					$('<a>').attr('href', '/suche/?'+ searchQueryString({fq: sqs}))
+					$('<a>').attr('href', '/suche?'+ searchQueryString({fq: sqs}))
 						.attr('title', 'Auswahl einschränken')
 						.click({'sqs': sqs}, function(evt) {
 							evt.preventDefault();
@@ -237,7 +237,7 @@ $(document).ready(function() {
 					list_element.prependTo(list);
 				else
 					list_element.appendTo(list);
-        //list.append('<li><a href="/suche/?'+ (searchQueryString({fq: sqs })) +'"><span class="facetlabel">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
+        //list.append('<li><a href="/suche?'+ (searchQueryString({fq: sqs })) +'"><span class="facetlabel">'+ label +'</span> <span class="num">'+ facet_data[i].value +'</span></a></li>');
       }
     }
     facet.append('<div class="header">'+ headline +'</div>');
@@ -328,7 +328,7 @@ $(document).ready(function() {
     // previous page
     if (start > 0) {
       $('<a>').attr('class', 'awesome extrawide paging back')
-	.attr('href', '/suche/?'+ searchQueryString({start: (start - OpenRIS.search_params['ppp'])}))
+	.attr('href', '/suche?'+ searchQueryString({start: (start - OpenRIS.search_params['ppp'])}))
 	.text('← Seite zurück')
 	.click(function(evt) {
 	  evt.preventDefault();
@@ -341,7 +341,7 @@ $(document).ready(function() {
     // next page
     if (numhits > (start + rows)) {
       $('<a>').attr('class', 'awesome extrawide paging next')
-	.attr('href', '/suche/?'+ searchQueryString({start: (start + OpenRIS.search_params['ppp'])}))
+	.attr('href', '/suche?'+ searchQueryString({start: (start + OpenRIS.search_params['ppp'])}))
 	.text('Seite weiter →')
 	.click(function(evt) {
 	  evt.preventDefault();
@@ -378,7 +378,7 @@ $(document).ready(function() {
       if (data.sort == o) {
 	$('<b>').text(sortOptions[o]).appendTo(widget);
       } else {
-	$('<a>').attr('href', '/suche/?'+ searchQueryString({start: 0, sort: o}))
+	$('<a>').attr('href', '/suche?'+ searchQueryString({start: 0, sort: o}))
 	  .text(sortOptions[o])
 	  .click({'o': o}, function(evt) {
 	    evt.preventDefault();

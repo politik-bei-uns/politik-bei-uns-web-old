@@ -35,7 +35,7 @@ $(document).ready(function(){
       $.each(OpenRIS.region.keyword, function(id, keyword){
         $('<a/>')
           .text(keyword)
-          .attr({'href': '/suche/?r=' + OpenRIS.region.id + '&q=' + encodeURI(keyword)})
+          .attr({'href': '/suche?r=' + OpenRIS.region.id + '&q=' + encodeURI(keyword)})
           .appendTo('#search-examples');
         if (OpenRIS.region.keyword.length > id + 1)
           $('#search-examples').append(document.createTextNode(', '));
@@ -293,7 +293,7 @@ $(document).ready(function(){
                 node[1], node[0]
               ));
             });
-            var markerHtml = '<p><b><a href="/suche/?r=' + OpenRIS.region.id + '&q=&quot;' + street_name + '&quot;">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
+            var markerHtml = '<p><b><a href="/suche?r=' + OpenRIS.region.id + '&q=&quot;' + street_name + '&quot;">' + street_name + ': ' + street.paper_count + ' Treffer</a></b>';
             if (street.paper_publishedDate && street.paper_name)
               markerHtml += '<br/>Der jüngste Treffer vom ' + OpenRIS.formatIsoDate(street.paper_publishedDate) + ' (' + street.paper_name + ')';
             markerHtml += '</p>';

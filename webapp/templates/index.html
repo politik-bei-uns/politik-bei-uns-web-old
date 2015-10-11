@@ -58,7 +58,7 @@ var CONF = {
   <div id="map" style="margin-top: 3px;"></div>
   <div class="content bottom searchform">
     <div class="header">&hellip; oder suchen Sie nach Themen, die Sie interessieren:</div>
-    <form id="search-form" method="get" action="/suche/" accept-charset="utf-8">
+    <form id="search-form" method="get" action="/suche" accept-charset="utf-8">
 			<p id="qinput-box">
 				<input type="text" id="qinput" name="q" value="" autocomplete="off" />
 			</p>
@@ -66,7 +66,7 @@ var CONF = {
 			<input type="hidden" id="qinput-region" name="r">
     </form>
     <div class="examples" id='search-examples'>
-      Beispiele: {% for example in config['regions'][region_id]['keyword'] %}<a href="/suche/?r={{ region_id }}&amp;q={{ example }}">{{ example }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+      Beispiele: {% for example in config['regions'][region_id]['keyword'] %}<a href="/suche?r={{ region_id }}&amp;q={{ example }}">{{ example }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
     </div>
   </div>
 </div>
