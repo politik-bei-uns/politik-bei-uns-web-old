@@ -78,7 +78,7 @@
     <div class="thumbs">
       <div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
         {% for thumbnail in file.thumbnails['300'] %}
-        <img class="thumb" src="{{ generate_file_thumbnail_url(file.body._id, file._id, 300, loop.index) }}" alt="Vorschau zu {{ file.name }} zum Thema {{ file.name }}" />
+        <img class="thumb" src="{{ generate_file_thumbnail_url(file.body._id, file._id, 300, loop.index) }}" alt="Vorschau zu {{ file.name }} zum Thema {{ file.name }}"{% if file.thumbnails['800'][loop.index - 1] %} data-width800="{{ file.thumbnails['800'][loop.index - 1]['width'] }}"{% endif %} />
         {% endfor %}
       </div>
     </div>
