@@ -62,8 +62,12 @@ def generate_sitemaps(config):
   bodies = []
   
   # tidy up
-  cmd = "rm -f %s/*.gz" % config['sitemap_folder']
-  execute(cmd)
+  for the_file in os.listdir(config['sitemap_folder']):
+    file_path = os.path.join(config['sitemap_folder'], the_file)
+    try:
+      os.unlink(file_path)
+    except Exception, e:
+      print e
   
   # gather bodies
   for body in db.body.find({}):
@@ -71,13 +75,15 @@ def generate_sitemaps(config):
   
     # gather file URLs
   for body in bodies:
+    print "Generating file sitemap for body %s" % body
     for file in db.file.find({'body': DBRef('body', body), 'depublication': {'$exists': False}}):
-      fileentry = db.fs.files.find_one(file['file'].id)
-      thisfile = {
-        'path': "%s/file/%s" % (config['base_url'], file['_id']),
-        'lastmod': fileentry['uploadDate']
-      }
-      urls.append(thisfile)
+      if 'file' in file:
+        fileentry = db.fs.files.find_one(file['file'].id)
+        thisfile = {
+          'path': "%s/file/%s" % (config['base_url'], file['_id']),
+          'lastmod': fileentry['uploadDate']
+        }
+        urls.append(thisfile)
 
     # create sitemap(s) with individual file URLs
     sitemap_count = 1
@@ -92,7 +98,8 @@ def generate_sitemaps(config):
 
   urls = []
   for body in bodies:
-    # gather submission URLs
+    print "Generating paper sitemap for body %s" % body
+    # gather paper URLs
     for paper in db.paper.find({'body': DBRef('body', body)}):
       thisfile = {
         'path': "%s/paper/%s" % (config['base_url'], paper['_id']),

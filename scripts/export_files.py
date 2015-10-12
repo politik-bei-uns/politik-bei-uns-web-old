@@ -65,15 +65,23 @@ def create_download_package(extconfig, db, fs, body_id):
   daterange: a datetime tuple compatible string
   folder: The target folder and final output filename prefix
   """
-  execute('rm -f %s.tar.bz2' % extconfig['files_dump_folder'] + os.sep + body_id + os.sep)
-  
+  print "Generating data dump for body %s" % body_id
+  try:
+    os.unlink(extconfig['files_dump_folder'] + os.sep + body_id + '.tar.bz2')
+  except Exception, e:
+    pass
   tmp_folder = (extconfig['files_dump_folder'] + os.sep + body_id + os.sep)
   if not os.path.exists(tmp_folder):
     os.makedirs(tmp_folder)
   
   for file in db.fs.files.find({'body': DBRef('body', ObjectId(body_id))}):
     file_id = file['_id']
-    path = tmp_folder + str(file_id) + '_' + file['filename']
+    ending = file['filename'].split('.')
+    if len(ending) > 1:
+      ending = '.' + ending[-1]
+    else:
+      ending = ''
+    path = tmp_folder + str(file_id) + ending
     save_file(fs, file_id, path)
   execute('tar -cjf %s.tar.bz2 -C %s .' % (extconfig['files_dump_folder'] + os.sep + body_id, tmp_folder))
   execute('rm -rf %s' % tmp_folder)
