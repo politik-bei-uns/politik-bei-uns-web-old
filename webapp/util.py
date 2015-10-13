@@ -202,6 +202,6 @@ app.jinja_env.filters['dottify'] = dottify
 
 def utfunescape(value):
   h = HTMLParser.HTMLParser()
-  return h.unescape(str(value))
+  return h.unescape(unicode(value))
 
 app.jinja_env.filters['utfunescape'] = utfunescape
