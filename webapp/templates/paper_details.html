@@ -191,31 +191,31 @@ var ok_document_url = '{{ paper._id }}';
   {% endif%}
   
 
-  {% for file in paper.auxiliaryFile %}
-  {% if file.thumbnails %}
-  {% set twidth = (file.thumbnails['300']|sum(attribute='width') + (11 * file.thumbnails['300']|length)) %}
+  {% for auxiliaryFile in paper.auxiliaryFile %}
+  {% if auxiliaryFile.thumbnails %}
+  {% set twidth = (auxiliaryFile.thumbnails['300']|sum(attribute='width') + (11 * auxiliaryFile.thumbnails['300']|length)) %}
   {% endif %}
-  <div class="attachment content middle" id="{{ file._id }}">
-    {% if file.thumbnails %}
-    {% set numpages = file.thumbnails['300']|length %}
+  <div class="attachment content middle" id="{{ auxiliaryFile['_id'] }}">
+    {% if auxiliaryFile.thumbnails %}
+    {% set numpages = auxiliaryFile.thumbnails['300']|length %}
     {% endif %}
-    <h2>Weitere Anlagen: {{ file.name|truncate(100) }}
+    <h2>Weitere Anlagen: {{ auxiliaryFile.name|truncate(100) }}
       {% if numpages %}
       ({{ numpages }} Seiten)
       {% endif %}
     </h2>
-    {% if file.depublication %}
+    {% if auxiliaryFile.depublication %}
     <div class="attachmentexclusion">
-      <p class="exclusionheader">Es tut uns leid, aber dieses Dokument wurde am {{ file.depublication.date.strftime('%d.%m.%Y') }} enfernt. Die Begründung:</p>
+      <p class="exclusionheader">Es tut uns leid, aber dieses Dokument wurde am {{ auxiliaryFile.depublication.date.strftime('%d.%m.%Y') }} enfernt. Die Begründung:</p>
       <p class="reasontext">
-        {{ file.depublication.comment }}
+        {{ auxiliaryFile.depublication.comment }}
       </p>
     </div>
     {% else %}
-    {% if file.thumbnails %}
+    {% if auxiliaryFile.thumbnails %}
     <div class="thumbs">
       <div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
-        {% for thumbnail in file.thumbnails['300'] %}
+        {% for thumbnail in auxiliaryFile.thumbnails['300'] %}
         <img class="thumb" src="{{ generate_file_thumbnail_url(paper.body._id, file._id, 300, loop.index) }}" alt="Vorschau zu {{ file.name }} zum Thema {{ paper.name }}"{% if file.thumbnails['800'][loop.index - 1] %} data-width800="{{ file.thumbnails['800'][loop.index - 1]['width'] }}"{% endif %} />
         {% endfor %}
       </div>
@@ -223,10 +223,10 @@ var ok_document_url = '{{ paper._id }}';
 		{% else %}
 		<div class="nothumbs"><div class="smallnote">Zu diesem Anhang liegen keine Vorschaubilder vor.</div></div>
 		{% endif %}
-		{% if file.fulltext %}
+		{% if auxiliaryFile.fulltext %}
 		<div class="fulltext">
 			<div class="complete">
-				<div class="text">{{ file.fulltext|trim }}</div>
+				<div class="text">{{ auxiliaryFile.fulltext|trim }}</div>
 			</div>
 		</div>
 		{% else %}
@@ -238,18 +238,18 @@ var ok_document_url = '{{ paper._id }}';
       <tbody>
         <tr>
 					<td class="label">ID: </td>
-					<td class="value">{{ file._id }}</td>
+					<td class="value">{{ auxiliaryFile._id }}</td>
         </tr>
 				<tr>
 					<td class="label">Orginal-Dateiname: </td>
-					<td class="value">{{ file.filename }}</td>
+					<td class="value">{{ auxiliaryFile.filename }}</td>
         </tr>
       </tbody>
     </table>
-    {% if file.file %}
+    {% if auxiliaryFile.file %}
     <div class="actions">
-			<a href="/file/{{ file._id }}" class="awesome">Details zum Anhang</a> <a href="/file/{{ file._id }}/download" class="awesome">Anhang speichern</a>
-			<span class="typesize">{{ (file.size / 1024)|round(0)|int }} KB PDF
+			<a href="/file/{{ auxiliaryFile._id }}" class="awesome">Details zum Anhang</a> <a href="/file/{{ auxiliaryFile._id }}/download" class="awesome">Anhang speichern</a>
+			<span class="typesize">{{ (auxiliaryFile.size / 1024)|round(0)|int }} KB PDF
     </div>
     {% endif %}
   {% endif%}

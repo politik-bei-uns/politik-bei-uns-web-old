@@ -34,6 +34,8 @@ vim config.py # Set Values
 
 virtualenv --no-site-packages venv
 pip install -update setuptools pip
+# Bugfix for matplotlib
+sudo ln -s /usr/include/freetype2/ft2build.h /usr/include/
 pip install numpy
 pip install -r requirements.txt
 
