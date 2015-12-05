@@ -14,6 +14,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 
 $(document).ready(function() {
+	OpenRIS.region.id = region_data['id'];
+	OpenRIS.region.name = region_data['name'];
+	OpenRIS.region.type = region_data['type'];
+	OpenRIS.region.lat = region_data['lat'];
+	OpenRIS.region.lon = region_data['lon'];
   OpenRIS.regionLoad();
   
   if (typeof openris_search_settings != undefined) {
