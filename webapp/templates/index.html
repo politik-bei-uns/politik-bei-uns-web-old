@@ -32,7 +32,7 @@ var CONF = {
   mapTileMaxZoom: {{ config.map_zoomlevel_max|safe }}
 };
 </script>
-<script type="text/javascript" src="{% if config['debug'] %}{{ url_for('static', filename='js/map.js') }}{% else %}{{ url_for('static', filename='js/map.min.js') }}{% endif %}?v=0.1.1"></script>
+<script type="text/javascript" src="{% if config['debug'] %}{{ url_for('static', filename='js/map.js') }}{% else %}{{ url_for('static', filename='js/map.min.js') }}{% endif %}?v={{ config['css_js_version'] }}"></script>
 {% endblock %}
 
 {% block riscontent %}
