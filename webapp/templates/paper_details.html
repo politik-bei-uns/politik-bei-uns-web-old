@@ -216,7 +216,7 @@ var ok_document_url = '{{ paper._id }}';
     <div class="thumbs">
       <div class="thumbsinner" style="width: {{ twidth }}px; height: 310px;">
         {% for thumbnail in auxiliaryFile.thumbnails['300'] %}
-        <img class="thumb" src="{{ generate_file_thumbnail_url(paper.body._id, file._id, 300, loop.index) }}" alt="Vorschau zu {{ file.name }} zum Thema {{ paper.name }}"{% if file.thumbnails['800'][loop.index - 1] %} data-width800="{{ file.thumbnails['800'][loop.index - 1]['width'] }}"{% endif %} />
+        <img class="thumb" src="{{ generate_file_thumbnail_url(paper.body._id, auxiliaryFile._id, 300, loop.index) }}" alt="Vorschau zu {{ auxiliaryFile.name }} zum Thema {{ paper.name }}"{% if auxiliaryFile.thumbnails['800'][loop.index - 1] %} data-width800="{{ auxiliaryFile.thumbnails['800'][loop.index - 1]['width'] }}"{% endif %} />
         {% endfor %}
       </div>
     </div>
@@ -253,6 +253,7 @@ var ok_document_url = '{{ paper._id }}';
     </div>
     {% endif %}
   {% endif%}
+  
   </div>
   {% endfor %}
 

@@ -27,7 +27,7 @@ $(document).ready(function() {
     url = Array();
     $.each( OpenRIS.search_params, function( key, value ) {
       if (value)
-	url.push(key + '=' + String(value).replace(/&#34;/g, "\""));
+		url.push(key + '=' + String(value).replace(/&#34;/g, "\""));
     });
     window.history.pushState(String(Date.now()), document.title, "/suche?" + url.join('&'));
     // run search

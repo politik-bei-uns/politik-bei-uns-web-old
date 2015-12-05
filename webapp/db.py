@@ -119,12 +119,12 @@ def get_meeting_count(search_params={}):
 # agendaItem
 def get_agendaItem(add_prefix='', add_postfix='', search_params={}, deref={}, sort=['modified', -1], limit=100):
   result = []
-  for agendaitem in mongo.db.agendaitem.find(search_params).sort(sort[0], sort[1]).limit(limit):
+  for agendaitem in mongo.db.agendaItem.find(search_params).sort(sort[0], sort[1]).limit(limit):
     result.append(agendaitem)
   return dereference_result_items(result, deref, add_prefix, add_postfix)
 
 def get_agendaItem_count(search_params={}):
-  return mongo.db.agendaitem.find(search_params).count()
+  return mongo.db.agendaItem.find(search_params).count()
 
 
 # consultation
@@ -181,6 +181,7 @@ def dereference_search_params(search_params, to_dereference):
 
 # derefs is {'value': 'string', 'list_select': 'string'} or {'values': ['string1', 'string2']}
 def dereference_result_items(result, deref, add_prefix, add_postfix):
+  print result
   # dereference value and select them
   if 'list_select' in deref:
     if deref['value'] in result[0]:
@@ -207,7 +208,9 @@ def dereference_result_items(result, deref, add_prefix, add_postfix):
             result[result_key][value] = mongo.db.dereference(result[result_key][value])
           else:
             for item_id in range(len(result[result_key][value])):
+              print result[result_key][value][item_id]
               result[result_key][value][item_id] = mongo.db.dereference(result[result_key][value][item_id])
+              print result[result_key][value][item_id]
     return result
   # do nothing
   else:

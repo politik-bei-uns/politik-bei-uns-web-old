@@ -24,6 +24,7 @@ $(document).ready(function(){
     // live search box
     $.geosearchbox.settings.url = '/api/locations?r=' + OpenRIS.region.id;
     $.papersearchbox.settings.url = '/api/papers-live?r=' + OpenRIS.region.id;
+    $('#search-form').attr({'action': '/suche?r=' + OpenRIS.region.id})
     
     map.setView(new L.LatLng(OpenRIS.region.lat, OpenRIS.region.lon), OpenRIS.region.zoom).addLayer(backgroundLayer);
     window.history.pushState(String(Date.now()), document.title, "/?r=" + OpenRIS.region.id);

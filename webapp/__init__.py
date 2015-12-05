@@ -25,7 +25,6 @@ from flask.ext.elasticsearch import FlaskElasticsearch
 
 
 app = Flask(__name__)
-app.debug = True
 app.config.from_pyfile('../config.py')
 
 # Cache
