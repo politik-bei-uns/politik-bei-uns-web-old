@@ -689,7 +689,6 @@ def oparl_basic(content_fuction, params={}, direct_output=False):
   jsonp_callback = request.args.get('callback', None)
   request_info = {}
   html = request.args.get('html')
-  html = html == '1'
   if html:
     request_info['html'] = 1
   extended_info = request.args.get('i')
