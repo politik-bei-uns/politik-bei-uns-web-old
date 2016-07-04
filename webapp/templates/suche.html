@@ -5,7 +5,7 @@
 
 {% block head %}
 {{ super() }}
-<link rel="alternate" type="application/rss+xml" title="RSS Feed neuer Dokumente in dieser Suche" href="/suche/feed/?r={{ search_settings.r }}&q={{ search_settings.q }}&fq={{ search_settings.fq }}" />
+<link rel="alternate" type="application/rss+xml" title="RSS Feed neuer Dokumente in dieser Suche" href="/suche/feed?r={{ search_settings.r }}&q={{ search_settings.q }}&fq={{ search_settings.fq }}" />
 {% endblock %}
 
 {% block scripts %}
