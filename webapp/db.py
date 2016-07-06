@@ -181,7 +181,6 @@ def dereference_search_params(search_params, to_dereference):
 
 # derefs is {'value': 'string', 'list_select': 'string'} or {'values': ['string1', 'string2']}
 def dereference_result_items(result, deref, add_prefix, add_postfix):
-  print result
   # dereference value and select them
   if 'list_select' in deref:
     if deref['value'] in result[0]:
@@ -208,9 +207,7 @@ def dereference_result_items(result, deref, add_prefix, add_postfix):
             result[result_key][value] = mongo.db.dereference(result[result_key][value])
           else:
             for item_id in range(len(result[result_key][value])):
-              print result[result_key][value][item_id]
               result[result_key][value][item_id] = mongo.db.dereference(result[result_key][value][item_id])
-              print result[result_key][value][item_id]
     return result
   # do nothing
   else:
@@ -463,7 +460,6 @@ def get_papers_live(search_string, region_id):
       }
     })
 
-  print query_parts
   result = es.search(
     index = app.config['es_paper_index'] + '-latest',
     doc_type = 'paper',
@@ -522,7 +518,6 @@ def get_locations_by_name(location_string, region_id):
       'minimum_should_match': 1
     }
   })
-  print query_parts
   result = es.search(
     index = app.config['es_location_index'] + '-latest',
     doc_type = 'street',

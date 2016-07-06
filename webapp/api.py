@@ -117,7 +117,6 @@ def api_locations():
   region = request.args.get('r', app.config['region_default'])
   if not region:
     region = app.config['region_default']
-  print region
   if location:
     result = db.get_locations_by_name(location, region)
   ret = {
