@@ -52,11 +52,7 @@ $(document).ready(function(){
   var markerLayerGroup = new L.LayerGroup();
   map.addLayer(markerLayerGroup);
   
-  var backgroundLayer = new L.TileLayer(CONF.mapTileUrlSchema, {
-      maxZoom: CONF.mapTileMaxZoom,
-      minZoom: CONF.mapTileMinZoom,
-      attribution: CONF.mapTileAttribution
-    });
+  var backgroundLayer = MQ.mapLayer();
   
   var sessionData = {}; // user session data
   

@@ -8,6 +8,7 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/ajaxq.js') }}"></script>
+<script src="https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key={{ config['mapquest_key'] }}"></script>
 <script>
 {% if session['region_id'] %}{% set region_id = session['region_id'] %}{% else %}{% set region_id = config['region_default'] %}{% endif %}
 var region_data = {
