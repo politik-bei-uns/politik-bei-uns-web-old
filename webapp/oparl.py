@@ -892,9 +892,11 @@ def oparl_file_downloadUrl_data(params):
 # misc
 ####################################################
 
-def oparl_basic(content_fuction, params={}, direct_output=False):
+def oparl_basic(content_fuction, params=None, direct_output=False):
   start_time = time.time()
   jsonp_callback = request.args.get('callback', None)
+  if not params:
+    params = {}
   request_info = {}
   html = request.args.get('html', False)
   if html:
