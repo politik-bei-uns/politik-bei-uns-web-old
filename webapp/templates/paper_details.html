@@ -106,6 +106,7 @@ var ok_document_url = '{{ paper._id }}';
     <h2>Beratungen in Gremien</h2>
     <ol>
       {% for consultation in paper.consultation %}
+      {% if consultation.agendaItem %}
       <li>
       {% if consultation.agendaItem.meeting %}
       <b>{{ consultation.agendaItem.meeting.name|utfunescape }}</b>,
@@ -123,6 +124,7 @@ var ok_document_url = '{{ paper._id }}';
         &ndash; {{ consultation.agendaItem.resolution|utfunescape }}
       {% endif %}
       </li>
+      {% endif %}
       {% endfor %}
     </ol>
   </div>
