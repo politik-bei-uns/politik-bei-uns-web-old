@@ -81,7 +81,7 @@ def generate_thumbs(db, config, body_id):
     'depublication': {'$exists': False},
     'body': DBRef('body', ObjectId(body_id))
   }
-  for single_file in db.file.find(query, timeout=False):
+  for single_file in db.file.find(query):
     # Dateiinfo abholen
     if single_file['modified'] > single_file['thumbnailsGenerated']:
       # Thumbnails müssen erneuert werden
@@ -93,7 +93,7 @@ def generate_thumbs(db, config, body_id):
     'depublication': {'$exists': False},
     'body': DBRef('body', ObjectId(body_id))
   }
-  for single_file in db.file.find(query, timeout=False):
+  for single_file in db.file.find(query):
     if 'file' not in single_file:
       print "FATAL! missing file"
     else:
