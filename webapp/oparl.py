@@ -46,7 +46,7 @@ from webapp import app
 def oparl_general():
   return oparl_basic(lambda params: {
     "id": "https://1-0.oparl.politik-bei-uns.de/oparl",
-    "type": "http://oparl.org/schema/1.0/System",
+    "type": "https://schema.oparl.org/1.0/System",
     "oparlVersion": "http://oparl.org/specs/1.0/",
     "otherOparlVersions": [],
     "name": "OKF-DE OParl Service",
@@ -121,7 +121,7 @@ def oparl_body_layout(data, params):
   data['type'] = 'https://oparl.org/schema/1.0/Body'
   data['created'] = datetime.datetime.strptime(data['created'], "%Y-%m-%dT%H:%M:%S.%f+00:00").strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = datetime.datetime.strptime(data['modified'], "%Y-%m-%dT%H:%M:%S.%f+00:00").strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   # additional transformations
   data['system'] = "%s/oparl%s" % (app.config['api_url'], generate_postfix(params))
   data['organization'] = "%s/oparl/body/%s/organization%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
@@ -154,7 +154,7 @@ def oparl_body_organization_data(params):
   for key, single in enumerate(data['data']):
     data['data'][key] = oparl_organization_layout(data=single, params=params)
   return data
-  
+
 
 # body person list
 @app.route('/oparl/body/<string:body_id>/person')
@@ -217,7 +217,7 @@ def oparl_body_paper_data(params):
                                    result_count=db.get_paper_count(search_params=search_params),
                                    data=data,
                                    type='paper')
-  
+
   for key_paper, single_paper in enumerate(data['data']):
     data['data'][key_paper] = oparl_paper_layout(data=single_paper, params=params)
   return data
@@ -248,7 +248,7 @@ def oparl_organization_layout(data, params):
   data['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['body'].id, generate_postfix(params))
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   # additional transformations
   if 'startDate' in data:
     if isinstance(data['startDate'], datetime.datetime):
@@ -256,15 +256,15 @@ def oparl_organization_layout(data, params):
   if 'endDate' in data:
     if isinstance(data['endDate'], datetime.datetime):
       data['endDate'] = data['endDate'].strftime("%Y-%m-%d")
-  
+
   data['membership'] = generate_backref_list(db.get_membership(search_params={'organization': DBRef('organization', ObjectId(data['_id']))}), params)
   data['meeting'] = "%s/oparl/organization/%s/meeting%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  
+
   if 'originalId' in data:
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
-  
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -307,11 +307,11 @@ def oparl_membership_data(params):
 def oparl_membership_layout(data, params):
   # default values
   data['id'] = "%s/oparl/membership/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'http://oparl.org/schema/1.0/Membership'
+  data['type'] = 'https://schema.oparl.org/1.0/Membership'
   data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   # additional transformations
   if 'startDate' in data:
     if isinstance(data['startDate'], datetime.datetime):
@@ -319,7 +319,7 @@ def oparl_membership_layout(data, params):
   if 'endDate' in data:
     if isinstance(data['endDate'], datetime.datetime):
       data['endDate'] = data['endDate'].strftime("%Y-%m-%d")
-  
+
   data['organization'] = "%s/oparl/organization/%s%s" % (app.config['api_url'], data['organization'].id, generate_postfix(params))
   data['person'] = "%s/oparl/person/%s%s" % (app.config['api_url'], db.get_person(search_params={'membership': DBRef('membership', ObjectId(data['_id']))})[0]['_id'], generate_postfix(params))
 
@@ -327,7 +327,7 @@ def oparl_membership_layout(data, params):
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
-  
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -336,9 +336,9 @@ def oparl_membership_layout(data, params):
     del data['originalUrl']
   if 'slug' in data:
     del data['slug']
-  
+
   return data
-  
+
 
 ####################################################
 # person
@@ -360,21 +360,21 @@ def oparl_person_data(params):
 def oparl_person_layout(data, params):
   # default values
   data['id'] = "%s/oparl/person/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'http://oparl.org/schema/1.0/Person'
+  data['type'] = 'https://schema.oparl.org/1.0/Person'
   data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   memberships = []
   for single_membership in data['membership']:
     memberships.append(oparl_membership_layout(single_membership, params))
   data['membership'] = memberships
-  
+
   if 'originalId' in data:
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
-  
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -383,7 +383,7 @@ def oparl_person_layout(data, params):
     del data['originalUrl']
   if 'slug' in data:
     del data['slug']
-  
+
   return data
 
 
@@ -409,11 +409,11 @@ def oparl_meeting_data(params):
 def oparl_meeting_layout(data, params):
   # default values
   data['id'] = "%s/oparl/meeting/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'http://oparl.org/schema/1.0/Meeting'
+  data['type'] = 'https://schema.oparl.org/1.0/Meeting'
   data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   # additional transformations
   if 'start' in data:
     if isinstance(data['start'], datetime.datetime):
@@ -421,15 +421,15 @@ def oparl_meeting_layout(data, params):
   if 'end' in data:
     if isinstance(data['end'], datetime.datetime):
       data['end'] = data['end'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   if 'address' in data:
     data['PolitikBeiUns:address'] = data['address']
     del data['address']
-  
+
   if 'room' in data:
     data['PolitikBeiUns:room'] = data['room']
     del data['room']
-  
+
   # if invitation is list -> Bug
   if 'invitation' in data:
     if isinstance(data['invitation'], list):
@@ -438,25 +438,25 @@ def oparl_meeting_layout(data, params):
         data['invitation'] = data['invitation'][0]
       else:
         del data['invitation']
-  
+
   if 'invitation' in data:
     if data['invitation']:
       data['invitation'] = oparl_file_layout(data['invitation'], params)
     else:
       del data['invitation']
-  
+
   if 'resultsProtocol' in data:
     if data['resultsProtocol']:
       data['resultsProtocol'] = oparl_file_layout(data['resultsProtocol'], params)
     else:
       del data['resultsProtocol']
-  
+
   if 'verbatimProtocol' in data:
     if data['verbatimProtocol']:
       data['verbatimProtocol'] = oparl_file_layout(data['verbatimProtocol'], params)
     else:
       del data['verbatimProtocol']
-  
+
   if 'participant' in data:
     data['membership'] = generate_backref_list(data['participant'], params)
   if 'auxiliaryFile' in data:
@@ -468,7 +468,7 @@ def oparl_meeting_layout(data, params):
       data['auxiliaryFile'] = auxiliaryFiles
     else:
       del data['auxiliaryFile']
-  
+
   if 'agendaItem' in data:
     agendaItems = []
     for single_agendaItem in data['agendaItem']:
@@ -478,13 +478,13 @@ def oparl_meeting_layout(data, params):
       data['agendaItem'] = agendaItems
     else:
       del data['agendaItem']
-  
+
   if 'originalId' in data:
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
-  
-  
+
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -493,7 +493,7 @@ def oparl_meeting_layout(data, params):
     del data['originalUrl']
   if 'slug' in data:
     del data['slug']
-  
+
   return data
 
 
@@ -522,11 +522,11 @@ def oparl_agendaItem_data(params):
 def oparl_agendaItem_layout(data, params):
   # default values
   data['id'] = "%s/oparl/agendaItem/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'http://oparl.org/schema/1.0/AgendaItem'
+  data['type'] = 'https://schema.oparl.org/1.0/AgendaItem'
   data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   # additional transformations
   if 'start' in data:
     if isinstance(data['start'], datetime.datetime):
@@ -534,16 +534,16 @@ def oparl_agendaItem_layout(data, params):
   if 'end' in data:
     if isinstance(data['end'], datetime.datetime):
       data['end'] = data['end'].strftime("%Y-%m-%dT%H:%M:%S")
-  
+
   if 'consultation' in data:
     data['consultation'] = "%s/oparl/consultation/%s%s" % (app.config['api_url'], data['consultation'].id, generate_postfix(params))
-  
-  
+
+
   if 'originalId' in data:
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
-  
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -552,7 +552,7 @@ def oparl_agendaItem_layout(data, params):
     del data['originalUrl']
   if 'slug' in data:
     del data['slug']
-  
+
   return data
 
 
@@ -580,24 +580,24 @@ def oparl_consultation_data(params):
 def oparl_consultation_layout(data, params):
   # default values
   data['id'] = "%s/oparl/consultation/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'http://oparl.org/schema/1.0/Consultation'
+  data['type'] = 'https://schema.oparl.org/1.0/Consultation'
   data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   # additional transformations
   if 'publishedDate' in data:
     if isinstance(data['publishedDate'], datetime.datetime):
       data['publishedDate'] = data['publishedDate'].strftime("%Y-%m-%d")
-  
+
   if 'paper' in data:
     data['paper'] = "%s/oparl/paper/%s%s" % (app.config['api_url'], data['paper'].id, generate_postfix(params))
-  
+
   if 'originalId' in data:
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
-  
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -606,7 +606,7 @@ def oparl_consultation_layout(data, params):
     del data['originalUrl']
   if 'slug' in data:
     del data['slug']
-  
+
   return data
 
 
@@ -632,7 +632,7 @@ def oparl_paper_data(params):
 def oparl_paper_layout(data, params):
   # default values
   data['id'] = "%s/oparl/paper/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'http://oparl.org/schema/1.0/Paper'
+  data['type'] = 'https://schema.oparl.org/1.0/Paper'
   data['body'] = generate_single_url(params=params, type='body', id=data['body'].id)
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
@@ -643,7 +643,7 @@ def oparl_paper_layout(data, params):
       data['mainFile'] = oparl_file_layout(data['mainFile'], params)
     else:
       del data['mainFile']
-  
+
   # auxiliaryFiles
   if 'auxiliaryFile' in data:
     auxiliaryFiles = []
@@ -654,20 +654,20 @@ def oparl_paper_layout(data, params):
       data['auxiliaryFile'] = auxiliaryFiles
     else:
       del data['data']
-  
+
   data['consultation'] = []
   consultations = db.get_consultation(search_params={'paper': DBRef('paper', ObjectId(data['_id']))})
   for consultation in consultations:
     data['consultation'].append(oparl_consultation_layout(consultation, params))
   if len(data['consultation']) == 0:
     del data['consultation']
-  
+
   # additional transformations
   if 'publishedDate' in data:
     if isinstance(data['publishedDate'], datetime.datetime):
       data['PolitikBeiUns:publishedDate'] = data['publishedDate'].strftime("%Y-%m-%d")
     del data['publishedDate']
-  
+
   # TODO for data model
   if 'georeferences' in data:
     del data['georeferences']
@@ -675,14 +675,14 @@ def oparl_paper_layout(data, params):
     del data['georeferencesGenerated']
   if 'title' in data:
     del data['title']
-  
+
   if 'originalId' in data:
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
   if 'nameShort' in data:
     data['reference'] = data['nameShort']
-  
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -760,14 +760,14 @@ def oparl_file_layout(data, params):
   data['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['body'].id, generate_postfix(params))
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
-  
+
   # additional transformations
   data['accessUrl'] = "%s/oparl/file/%s/access%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
   data['downloadUrl'] = "%s/oparl/file/%s/download%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
   if 'date' in data:
     if isinstance(data['date'], datetime.datetime):
       data['date'] = data['date'].strftime("%Y-%m-%d")
-  
+
   # TODO: rename stuff
   if 'fulltext' in data:
     data['text'] = data['fulltext']
@@ -778,14 +778,14 @@ def oparl_file_layout(data, params):
   if 'filename' in data:
     data['fileName'] = data['filename']
     del data['filename']
-  
+
   if 'originalId' in data:
     data['PolitikBeiUns:originalId'] = data['originalId']
   if 'originalUrl' in data:
     data['PolitikBeiUns:originalUrl'] = data['originalUrl']
   if 'originalDownloadPossible' in data:
     data['PolitikBeiUns:originalDownloadPossible'] = data['originalDownloadPossible']
-  
+
   # delete stuff
   del data['_id']
   if 'originalId' in data:
@@ -867,7 +867,7 @@ def oparl_file_downloadUrl_data(params):
     # TODO: Rendere informativere 404 Seite
     abort(404)
   file_data = file_data[0]
-  
+
   # 'file' property is not set (e.g. due to depublication)
   if 'file' not in file_data:
     if 'depublication' in file_data:
@@ -956,14 +956,14 @@ def generate_postfix(params, additional_params=[]):
   else:
     postfix = ''
   return(postfix)
-  
+
 def generate_single_url(params={}, type='', id=''):
   return "%s/oparl/%s/%s%s" % (app.config['api_url'], type, id, generate_postfix(params))
 
 def generate_single_backref_url(params={}, get='', type='', reverse_type='', id=''):
   get = getattr(db, get)
   uid = str((get(search_params={reverse_type: DBRef(reverse_type, ObjectId(id))}, values={'_id':1}))[0]['_id'])
-  return "%s/oparl/%s/%s%s" % (app.config['api_url'], type, uid, generate_postfix(params)) 
+  return "%s/oparl/%s/%s%s" % (app.config['api_url'], type, uid, generate_postfix(params))
 
 def generate_backref_list(data, params):
   result = []
