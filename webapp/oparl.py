@@ -118,7 +118,7 @@ def oparl_body_data(params):
 def oparl_body_layout(data, params):
   # default values
   data['id'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'https://oparl.org/schema/1.0/Body'
+  data['type'] = 'https://schema.oparl.org/1.0/Body'
   data['created'] = datetime.datetime.strptime(data['created'], "%Y-%m-%dT%H:%M:%S.%f+00:00").strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = datetime.datetime.strptime(data['modified'], "%Y-%m-%dT%H:%M:%S.%f+00:00").strftime("%Y-%m-%dT%H:%M:%S+01:00")
 
@@ -244,7 +244,7 @@ def oparl_organization_data(params):
 def oparl_organization_layout(data, params):
   # default values
   data['id'] = "%s/oparl/organization/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'https://oparl.org/schema/1.0/Organization'
+  data['type'] = 'https://schema.oparl.org/1.0/Organization'
   data['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['body'].id, generate_postfix(params))
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
@@ -756,7 +756,7 @@ def oparl_file_data(params):
 def oparl_file_layout(data, params):
   # default values
   data['id'] = "%s/oparl/file/%s%s" % (app.config['api_url'], data['_id'], generate_postfix(params))
-  data['type'] = 'https://oparl.org/schema/1.0/File'
+  data['type'] = 'https://schema.oparl.org/1.0/File'
   data['body'] = "%s/oparl/body/%s%s" % (app.config['api_url'], data['body'].id, generate_postfix(params))
   data['created'] = data['created'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
   data['modified'] = data['modified'].strftime("%Y-%m-%dT%H:%M:%S+01:00")
