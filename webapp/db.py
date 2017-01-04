@@ -221,7 +221,7 @@ def get_all_new():
   for item in mongo.db.body.find({},{'_id':1,'created':1}).sort('created', PyMongo.DESCENDING):
     result.append({
       'id': "%s/body/%s" % (app.config['api_url'], item['_id']),
-      'type': "http://oparl.org/schema/1.0/Body",
+      'type': "http://schema.oparl.org/1.0/Body",
       'created': item['created'].isoformat()
     })
   #TODO: All Other Stuff
